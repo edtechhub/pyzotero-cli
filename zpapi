@@ -1,378 +1,196 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-# Commandline interface for https://pyzotero.readthedocs.io/en/latest/#
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 import argparse
 import sys
-import logging
-import json
 import os
-import configparser
-
+from netrc import netrc
+from munch import Munch
+import toml
 from pyzotero import zotero
+import json
 
-_logger = logging.getLogger()
+class Zotero(object):
+  def __init__(self):
+    # global parameters for all commands
+    self.parser = argparse.ArgumentParser()
+    self.parser.add_argument('--api_key')
+    self.parser.add_argument('--config', type=lambda x: x if os.path.exists(x) else self.parser.error(f'config file {x} does not exist'))
+    self.parser.add_argument('--library-id', type=int)
+    self.parser.add_argument('--library-type', choices=['user', 'group'])
+    self.parser.add_argument('--indent', type=int, default=2)
 
-permittedFunctions = (
-    'key_info',
-    'items',
-    'count_items',
-    'top',
-    'publications',
-    'trash',
-    'deleted',
-    'tags',
-    'countitemswithtag',
-    'everything',
-    'num_items',
-    'searches',
-    'saved_search',
-    '...'
-)
+    subparsers = self.parser.add_subparsers(help='commands', dest='command', required=True)
+    # add all methods that do not start with _ as a command
+    for cmd in dir(self):
+      if cmd[0] == '_': continue
 
-jsonIndent = 2
+      action = getattr(self, cmd)
+      if not callable(action): continue
 
-def parse_args(args):
-    """Parse command line parameters
+      sp = subparsers.add_parser(cmd.replace('_', '-'), help=action.__doc__)
+      # when called with an argparser, the command is expected to add relevant parameters and return
+      # the command must have a docstring
+      action(sp)
 
-    Args:
-      args ([str]): command line parameters as list of strings
+    self.args = self.parser.parse_args()
 
-    Returns:
-      :obj:`argparse.Namespace`: command line parameters namespace
-    """
-    parser = argparse.ArgumentParser(
-        description="Dump records from a Zotero library")
-    parser.add_argument(
-        '--api_key',
-        help='Zotero API key')
-    parser.add_argument(
-        '--library_id',
-        type=int,
-        help="Zotero library numeric ID")
-    parser.add_argument(
-        '--library_type',
-        choices=('user', 'group'),
-        help="Zotero library type [user|group]")
-    parser.add_argument(
-        '--tag',
-        help='Filter by tag')
-    parser.add_argument(
-        '--action',
-        type=str,
-        required=True,
-        choices=permittedFunctions,
-        help='The action to be done.')
-    parser.add_argument(
-        '--filter',
-        type=str,
-        help='Search/request parameters.')
-    parser.add_argument(
-        '--indent',
-        type=int,
-        required=False,
-        default=2,
-        dest="jsonIndent",
-        help="set indent for JSON output.")
-    parser.add_argument(
-        '-v',
-        '--verbose',
-        dest="loglevel",
-        help="set loglevel to INFO",
-        action='store_const',
-        const=logging.INFO)
-    parser.add_argument(
-        '-vv',
-        '--very-verbose',
-        dest="loglevel",
-        help="set loglevel to DEBUG",
-        action='store_const',
-        const=logging.DEBUG)
-    parser.add_argument(
-        'files',
-        nargs="*",
-        type=str,
-        help="positional arguments, usually supplying files",        
-        )
-    return parser.parse_args(args)
-
-def setup_logging(loglevel):
-    """Setup basic logging
-
-    Args:
-      loglevel (int): minimum loglevel for emitting messages
-    """
-    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
-    logging.basicConfig(level=loglevel, stream=sys.stdout,
-                        format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
-
-# Examples    
-
-def zotero_example_get_tag(zot, tag=None):
-    if filter:
-        print("--filter has no effect for this action.")
-    items = zot.everything(zot.items(tag=tag))
-    for item in items:
-        print(json.dumps(item, indent=jsonIndent))
-
-def zotero_exanple_get_not_attachment_or_note(zot):
-    if filter:
-        print("--filter has no effect for this action.")
-    items = zot.everything(zot.items(itemType=["-attachment","-note"]))
-    print(json.dumps(items, indent=jsonIndent))
-
-
-# Implementation of API methods
-# These should all have an 'everything' option.
-
-#  Zotero.key_info()
-def zotero_key_info(zot, **filter):
-    if filter:
-        print("--filter has no effect for this action.")
-    items = zot.key_info()
-    print(json.dumps(items, indent=jsonIndent))
-
-#  Zotero.items([search/request parameters])    
-def zotero_items(zot, **filter):
-    if filter:
-        items = zot.items(filter)
+    # pick up config
+    if not self.args.config and os.path.exists('zpapi.toml'):
+      self.args.config = 'zpapi.toml'
+    if self.args.config:
+      with open(self.args.config) as f:
+        self.config = toml.load(f, _dict=Munch)
     else:
-        items = zot.items()
-    print(json.dumps(items, indent=jsonIndent))
+      self.config = toml.loads('', _dict=Munch)
 
-#  Zotero.count_items()
-def zotero_count_items(zot, **filter):    
-    if filter:
-        print("--filter has no effect for this action.")
-    items = zot.count_items(filter)
-    print(json.dumps(items, indent=jsonIndent))
+    if not self.args.library_type:
+      # try from the config
+      self.args.library_type = self.config.get('library_type')
+    if not self.args.library_type:
+      self.parser.error('no library type provided')
+    elif self.args.library_type not in ['user', 'group']:
+      self.parser.error('library type must be "user" or "group"')
 
-# Zotero.top([search/request parameters])
-def zotero_top(zot, **filter):    
-    if filter:
-        items = zot.top(filter)
+    if not self.args.library_id:
+      # try from the config
+      self.args.library_id = self.config.get('library_id')
+      try:
+        if self.args.library_id: self.args.library_id = int(self.args.library_id)
+      except ValueError:
+        self.parser.error(f'library ID must be numeric, not {self.args.library_id}')
+
+    if not self.args.library_id:
+      if self.args.library_type == 'group':
+        self.parser.error('no library ID specified')
+      else:
+        self.parser.error('no user ID specified')
+
+    if not self.args.api_key:
+      self.args.api_key = self.config.get('api_key')
+
+    if not self.args.api_key:
+      self.args.api_key = os.environ.get('ZOTERO_API_KEY', None)
+
+    if not self.args.api_key:
+      info = netrc().authenticators('api.zotero.org')
+      if info: self.args.api_key = info[2]
+
+    if not self.args.api_key:
+      self.parser.error('no API key provided')
+
+    self.zotero = zotero.Zotero(self.args.library_id, self.args.library_type, self.args.api_key)
+
+    # call the actual command
+    getattr(self, self.args.command.replace('-', '_'))()
+
+  #### THE COMMANDS ####
+
+  def key(self, argparser=None):
+    """Show key info"""
+
+    if argparser: return
+
+    print(json.dumps(self.zotero.key_info(), indent = self.args.indent))
+
+  def items(self, argparser=None):
+    """fetch items"""
+
+    if argparser:
+      group = argparser.add_mutually_exclusive_group()
+
+      group.add_argument('--count', action='store_true')
+
+      other = group.add_argument_group()
+      other.add_argument('--filter')
+      other.add_argument('--top', action='store_true')
+      return
+
+    if self.args.count:
+      print(json.dumps(self.zotero.count_items(), indent=self.args.indent))
+      return
+
+    # why not as separate add_argument s?
+    args = json.loads(self.args.filter) if self.args.filter else {}
+
+    if self.args.top:
+      items = self.zotero.top(**args)
     else:
-        items = zot.top()
-    print(json.dumps(items, indent=jsonIndent))
+      items = self.zotero.items(**args)
+      if not 'limit' in args: items = self.zotero.everything(items)
 
-#  Zotero.publications()
-def zotero_publications(zot, **filter):    
-    if filter:
-        print("--filter has no effect for this action.")
-    items = zot.publications(filter)
-    print(json.dumps(items, indent=jsonIndent))
+    print(json.dumps(items, indent=self.args.indent))
 
-# Zotero.trash([search/request parameters])
-# Returns library items from the library’s trash
-def zotero_trash(zot, **filter):    
-    if filter:
-        items = zot.trash(filter)
+  def publications(self, argparser=None):
+    """documentation here"""
+
+    if argparser: return
+
+    print(json.dumps(self.zotero.publications(), indent = self.args.indent))
+
+  def trash(self, argparser=None):
+    """returns library items from the library’s trash"""
+
+    if argparser: return
+    print(json.dumps(self.zotero.trash(), indent = self.args.indent))
+
+  def deleted(self, argparser=None):
+    """returns library items from the library’s trash"""
+
+    if argparser:
+      argparser.add_argument('--filter')
+      return
+
+    args = json.loads(self.args.filter) if self.args.filter else {}
+    print(json.dumps(self.zotero.deleted(**args), indent = self.args.indent))
+
+  def tags(self, argparser=None):
+    """returns library items from the library’s trash"""
+
+    if argparser:
+      argparser.add_argument('--filter')
+      argparser.add_argument('--count')
+      return
+
+    args = json.loads(self.args.filter) if self.args.filter else {}
+    items = self.zotero.items(**args)
+    if not 'limit' in args: items = self.zotero.everything(items)
+
+    if self.args.count:
+      for tag in items:
+        print(f'{tag} {self.zotero.num_tagitems(tag)}')
     else:
-        items = zot.trash()
-    print(json.dumps(items, indent=jsonIndent))
+      print(json.dumps(items, indent=self.args.indent))
 
-# Zotero.deleted([search/request parameters])    
-# Returns deleted collections, library items, tags, searches and settings (requires “since=” parameter)
-def zotero_deleted(zot, **filter):    
-    if filter:
-        items = zot.deleted(filter)
-    else:
-        items = zot.deleted()
-    print(json.dumps(items, indent=jsonIndent))
+  def searches(self, argparser=None):
+    """searches"""
 
-#   Zotero.item(itemID[, search/request parameters])
-#   Zotero.children(itemID[, search/request parameters])
-#   Zotero.collection_items(collectionID[, search/request parameters])
-#   Zotero.collection_items_top(collectionID[, search/request parameters])
-#   Zotero.get_subset(itemIDs[, search/request parameters])
-#   Zotero.file(itemID[, search/request parameters])
-#   Zotero.dump(itemID[, filename, path])
-#   Zotero.collections([search/request parameters])
-#   Zotero.collections_top([search/request parameters])
-#   Zotero.collection(collectionID[, search/request parameters])
-#   Zotero.collections_sub(collectionID[, search/request parameters])
-#   Zotero.all_collections([collectionID])
-#   Zotero.groups([search/request parameters])
+    if argparser: return
+    print(json.dumps(self.zotero.searches(), indent = self.args.indent))
 
-#   Zotero.tags([search/request parameters])
-def zotero_tags(zot, **filter):    
-    if filter:
-        items = zot.everything(zot.tags(filter))
-    else:
-        items = zot.everything(zot.tags())
-    print(json.dumps(items, indent=jsonIndent))
+  def saved_search(self, argparser=None):
+    """saved searches"""
 
+    if argparser:
+      argparser.add_argument('files', nargs='*')
+      return
 
-#   countitemswithtag
-def zotero_countitemswithtag(zot, **filter):    
-    if filter:
-        items = zot.everything(zot.tags(filter))
-    else:
-        items = zot.everything(zot.tags())
-    # print(json.dumps(items, indent=jsonIndent))
-    for tag in items:
-        items = zot.num_tagitems(tag)
-        print(tag + " " + items)
-    
-#   Zotero.item_tags(itemID[, search/request parameters])
-#   Zotero.item_versions([search/request parameters])
-#   Zotero.collection_versions(itemID[, search/request parameters])
-#   Zotero.new_fulltext(since)
-#   Zotero.fulltext_item(itemID[, search/request parameters])
-#   Zotero.set_fulltext(itemID, payload)
-##  Zotero.follow()
+    if not self.args.files or len(self.args.files) == 0:
+      self.parser.error('files are required for saved-search')
+      return
 
-#   Zotero.everything()
-def zotero_everything(zot, **filter):
-    if filter:
-        items = zot.everything(zot.items(filter))
-    else:
-        items = zot.everything(zot.items())
-    print(json.dumps(items, indent=jsonIndent))
+    for search in self.args.files:
+      print(f'Search file: {search}')
 
-##  Zotero.iterfollow()
-##  Zotero.makeiter(API call)
+      with open(search) as f:
+        searchdefs = json.load(f)
+          for searchdef in searchdefs:
+            print(f'   Adding: {mydef["name"]}')
+            result = self.zotero.saved_search(mydef['name'], mydef['conditions'])
+            print(json.dumps(result, indent=self.args.indent))
+    print('Done')
 
-#   Zotero.num_items()     
-def zotero_num_items(zot, **filter):
-    if filter:
-        print("--filter has no effect for this action.")
-    items = zot.num_items()
-    print(json.dumps(items, indent=jsonIndent))
-
-#   Zotero.num_collectionitems(collectionID)
-#   Zotero.num_tagitems(tag)
-#   Zotero.last_modified_version()
-    
-def zotero_searches(zot, **filter):
-    if filter:
-        print("--filter has no effect for this action.")
-    items = zot.searches()
-    print(json.dumps(items, indent=jsonIndent))
-
-def zotero_saved_search(zot, **filter):
-    if filter:
-        print("--filter has no effect for this action.")
-    if args.files is None:
-        print("No positional arguments.")
-        exit()
-    for file in arg.files:
-        print("Search file: " + file)
-        with open(file) as json_file:  
-            searchdefs = json.load(json_file)
-            for mydef in searchdefs:
-                print("   Adding: "+ mydef['name']);
-                result = zot.saved_search(mydef['name'], mydef['conditions'])
-                print(json.dumps(result))
-    print("Done")
-
-# Zotero.delete_saved_search(search_keys)
-# Zotero.show_operators()
-# Zotero.show_conditions()
-# Zotero.show_condition_operators(condition)
-# Zotero.item_types()
-# Zotero.item_fields()
-# Zotero.item_creator_types(itemtype)
-# Zotero.creator_fields()
-# Zotero.item_type_fields(itemtype)
-# Zotero.item_template(itemtype)
-# Zotero.create_items(items[, parentid, last_modified])
-# Zotero.update_item(item[, last_modified])
-# Zotero.update_items(items)
-# Zotero.check_items(items)
-# Zotero.attachment_simple(files[, parentid])
-# Zotero.attachment_both(files[, parentid])
-# Zotero.delete_item(item[, last_modified])
-# Zotero.delete_tags(tag_a[, tag …])
-# Zotero.add_tags(item, tag[, tag …])
-# Zotero.create_collections(dicts[, last_modified])
-# Zotero.create_collections(dicts[, last_modified])
-# Zotero.addto_collection(collection, item)
-# Zotero.deletefrom_collection(collection, item)
-# Zotero.update_collection(collection , last_modified])
-# Zotero.update_collections(collection_items)
-# Zotero.collection_tags(collectionID[, search/request parameters])
-# Zotero.delete_collection(collection[, last_modified])
-
-
-def main(args):
-    """Main entry point allowing external calls
-
-    Args:
-      args ([str]): command line parameter list
-    """
-    args = parse_args(args)
-    setup_logging(args.loglevel)
-    _logger.debug("zpapi: %s", args)
-    config = configparser.ConfigParser()
-    config.read('zpapi.ini')
-    if args.loglevel==logging.INFO:
-        print(args.action)
-        if args.files is None:
-            print("No positional arguments.")
-        else:
-            print(len(args.files))
-    # doesn't work
-    jsonIndent = args.jsonIndent
-    # Test whether api_key etc is given on command line one not:
-    if args.api_key is None:
-        if 'ZOTERO_API_KEY' in os.environ:
-            args.api_key = os.environ['ZOTERO_API_KEY']
-        elif config['DEFAULT']['ZOTERO_API_KEY'] is None:
-            print('You must provide --api_key or set the ZOTERO_API_KEY environment variable')
-            exit();
-        else: 
-            args.api_key = config['DEFAULT']['ZOTERO_API_KEY']
-    if args.library_id is None:
-        if 'ZOTERO_LIBRARY_ID' in os.environ:
-            args.library_id = os.environ['ZOTERO_LIBRARY_ID']
-        elif config['DEFAULT']['ZOTERO_LIBRARY_ID'] is None:
-            print('You must provide --library_id or set the ZOTERO_LIBRARY_ID environment variable')
-            exit();
-        else:
-            args.library_id = config['DEFAULT']['ZOTERO_LIBRARY_ID']
-    if args.library_type is None:
-        if 'ZOTERO_LIBRARY_TYPE' in os.environ:
-            args.library_type = os.environ['ZOTERO_LIBRARY_TYPE']
-        elif config['DEFAULT']['ZOTERO_LIBRARY_TYPE'] is None:
-            print('You must provide --library_type or set the ZOTERO_LIBRARY_TYPE environment variable')
-            exit();
-        else:
-            args.library_type = config['DEFAULT']['ZOTERO_LIBRARY_TYPE']
-    if args.filter is None:
-        filter = {}
-    else:
-        filter = json.loads(args.filter)
-        print(args.filter)
-    action = "zotero_"+args.action
-    #print(json.dumps(dict(locals())))
-    if action not in dict(globals()):
-        print("Error: An action "+action+" is available without a corresponding function");
-        #exit();
-    # Connect to Zotero
-    #zot = zotero.Zotero(library_id, library_type, api_key)
-    zot = zotero.Zotero(args.library_id, args.library_type, args.api_key)
-    # Execute required action
-    #    zotero_get(args.api_key, args.library_id, args.library_type, args.tag)
-    #    zotero_get(args.api_key, args.library_id, args.library_type)
-    if args.action == "saved_search":
-        if args.files is None:
-            print("You have to provide one or more json file.")
-            exit()
-        globals()[action](zot, **filter)
-        exit()
-        
-    globals()[action](zot, **filter)
-
-    _logger.info("Finished")
-
-    
-def run():
-    """Entry point for console_scripts
-    """
-    main(sys.argv[1:])
-
-
-if __name__ == "__main__":
-    run()
+if __name__ == '__main__':
+  Zotero()

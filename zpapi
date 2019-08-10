@@ -89,14 +89,14 @@ class Zotero(object):
   #### THE COMMANDS ####
 
   def key(self, argparser=None):
-    """Show key info"""
+    """TODO: document"""
 
     if argparser: return
 
     print(json.dumps(self.zotero.key_info(), indent = self.args.indent))
 
   def items(self, argparser=None):
-    """fetch items"""
+    """TODO: document"""
 
     if argparser:
       group = argparser.add_mutually_exclusive_group()
@@ -124,20 +124,20 @@ class Zotero(object):
     print(json.dumps(items, indent=self.args.indent))
 
   def publications(self, argparser=None):
-    """documentation here"""
+    """TODO: document"""
 
     if argparser: return
 
     print(json.dumps(self.zotero.publications(), indent = self.args.indent))
 
   def trash(self, argparser=None):
-    """returns library items from the library’s trash"""
+    """TODO: document"""
 
     if argparser: return
     print(json.dumps(self.zotero.trash(), indent = self.args.indent))
 
   def deleted(self, argparser=None):
-    """returns library items from the library’s trash"""
+    """TODO: document"""
 
     if argparser:
       argparser.add_argument('--filter')
@@ -147,7 +147,7 @@ class Zotero(object):
     print(json.dumps(self.zotero.deleted(**args), indent = self.args.indent))
 
   def tags(self, argparser=None):
-    """returns library items from the library’s trash"""
+    """TODO: document"""
 
     if argparser:
       argparser.add_argument('--filter')
@@ -165,13 +165,13 @@ class Zotero(object):
       print(json.dumps(items, indent=self.args.indent))
 
   def searches(self, argparser=None):
-    """searches"""
+    """TODO: document"""
 
     if argparser: return
     print(json.dumps(self.zotero.searches(), indent = self.args.indent))
 
   def saved_search(self, argparser=None):
-    """saved searches"""
+    """TODO: document"""
 
     if argparser:
       argparser.add_argument('files', nargs='*')

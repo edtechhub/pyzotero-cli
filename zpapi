@@ -186,10 +186,10 @@ class Zotero(object):
 
       with open(search) as f:
         searchdefs = json.load(f)
-          for searchdef in searchdefs:
-            print(f'   Adding: {mydef["name"]}')
-            result = self.zotero.saved_search(mydef['name'], mydef['conditions'])
-            print(json.dumps(result, indent=self.args.indent))
+        for searchdef in searchdefs:
+          print(f'   Adding: {mydef["name"]}')
+          result = self.zotero.saved_search(mydef['name'], mydef['conditions'])
+          print(json.dumps(result, indent=self.args.indent))
     print('Done')
 
 if __name__ == '__main__':

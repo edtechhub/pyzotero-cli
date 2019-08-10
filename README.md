@@ -11,6 +11,10 @@ Install requirements
  
  pip3 install -r requirements.txt
 
+## Notes
+
+- Uses https://json-schema.org/ to validate items for completion..
+- Ini file format https://github.com/toml-lang/toml
 
 ## Disclaimer
 

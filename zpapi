@@ -99,13 +99,13 @@ class Zotero(object):
     """TODO: document"""
 
     if argparser:
-      group = argparser.add_mutually_exclusive_group()
+      argparser.add_argument('--count', action='store_true')
+      argparser.add_argument('--filter')
+      argparser.add_argument('--top', action='store_true')
+      return
 
-      group.add_argument('--count', action='store_true')
-
-      other = group.add_argument_group()
-      other.add_argument('--filter')
-      other.add_argument('--top', action='store_true')
+    if self.args.count and self.args.filter:
+      self.parser.error('--count does not support --filter')
       return
 
     if self.args.count:

@@ -11,6 +11,7 @@ from munch import Munch
 import toml
 from pyzotero import zotero
 import json
+import jsonschema
 
 class Zotero(object):
   def __init__(self):
@@ -46,40 +47,68 @@ class Zotero(object):
     else:
       self.config = toml.loads('', _dict=Munch)
 
-    if not self.args.library_type:
-      # try from the config
-      self.args.library_type = self.config.get('library_type')
-    if not self.args.library_type:
-      self.parser.error('no library type provided')
-    elif self.args.library_type not in ['user', 'group']:
-      self.parser.error('library type must be "user" or "group"')
+    # expand command
+    for action in sum([(a.choices[self.args.command]._actions if a.dest == 'command' else [a]) for a in self.parser._actions], []):
+      if action.dest in [ 'help', 'config']: continue
 
-    if not self.args.library_id:
-      # try from the config
-      self.args.library_id = self.config.get('library_id')
-      try:
-        if self.args.library_id: self.args.library_id = int(self.args.library_id)
-      except ValueError:
-        self.parser.error(f'library ID must be numeric, not {self.args.library_id}')
+      if getattr(self.args, action.dest, None) is not None: continue
+
+      value = None
+
+      # first try explicit config
+      if value is None and self.args.config:
+        value = self.config.get(self.args.command, {}).get(action.dest, self.config.get(action.dest))
+
+      # next, ENV vars. Also picks up from .env
+      if value is None:
+        value = os.environ.get(f'ZPAPI_{action.dest.upper()}', os.environ.get(f'ZOTERO_{action.dest.upper()}'))
+
+      # last, implicit config
+      if value is None:
+        value = self.config.get(self.args.command, {}).get(action.dest, self.config.get(action.dest))
+
+      if value is None: continue
+
+      if action.type == int:
+        try:
+          value = int(value)
+        except ValueError:
+          self.parser.error(f'{action.dest} must be numeric, not {value}')
+      elif action.choices:
+        if value not in action.choices:
+          self.parser.error(f'{action.dest} must be one of {action.choices}')
+      elif action.const == True:
+        try:
+          value = {
+            True: True,
+            'true': True,
+            'yes': True,
+            'on': True,
+            False: False,
+            'false': False,
+            'no': False,
+            'off': False,
+          }[value]
+        except KeyError:
+          self.parser.error(f'{action.dest} must be boolean, not {value}')
+      elif callable(action.type):
+        # file
+        pass
+      else:
+        # string
+        pass
+
+      setattr(self.args, action.dest, value)
+
+    if not self.args.api_key: self.parser.error('no API key provided')
+
+    if not self.args.library_type: self.parser.error('no library type provided')
 
     if not self.args.library_id:
       if self.args.library_type == 'group':
         self.parser.error('no library ID specified')
       else:
         self.parser.error('no user ID specified')
-
-    if not self.args.api_key:
-      self.args.api_key = self.config.get('api_key')
-
-    if not self.args.api_key:
-      self.args.api_key = os.environ.get('ZOTERO_API_KEY', None)
-
-    if not self.args.api_key:
-      info = netrc().authenticators('api.zotero.org')
-      if info: self.args.api_key = info[2]
-
-    if not self.args.api_key:
-      self.parser.error('no API key provided')
 
     self.zotero = zotero.Zotero(self.args.library_id, self.args.library_type, self.args.api_key)
 
@@ -102,10 +131,11 @@ class Zotero(object):
       argparser.add_argument('--count', action='store_true')
       argparser.add_argument('--filter')
       argparser.add_argument('--top', action='store_true')
+      argparser.add_argument('--validate', type=lambda x: x if os.path.exists(x) else self.parser.error(f'schema file {x} does not exist'), help='json-schema file for all itemtypes, or directory with schema files, one per itemtype')
       return
 
-    if self.args.count and self.args.filter:
-      self.parser.error('--count does not support --filter')
+    if self.args.count and (self.args.filter or self.args.validate or self.args.top):
+      self.parser.error('--count cannot be combined with other options')
       return
 
     if self.args.count:
@@ -121,7 +151,23 @@ class Zotero(object):
       items = self.zotero.items(**args)
       if not 'limit' in args: items = self.zotero.everything(items)
 
-    print(json.dumps(items, indent=self.args.indent))
+    if self.args.validate:
+      schemas = {}
+      if os.path.isfile(self.args.validate):
+        with open(self.args.validate) as f:
+          schema = json.load(f)
+      # still a bit rudimentary
+      for item in items:
+        if os.path.isdir(self.args.validate):
+          if item['itemType'] not in schemas:
+            with open(os.path.join(self.args.validate, item['itemType'] + '.json')) as f:
+              schemas[item['itemType']] = json.load(f)
+          schema = schemas[item['itemType']]
+
+        jsonschema.validate(instance=item, schema=schema)
+
+    else:
+      print(json.dumps(items, indent=self.args.indent))
 
   def publications(self, argparser=None):
     """TODO: document"""

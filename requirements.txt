@@ -2,3 +2,4 @@ pyzotero
 toml
 python-dotenv
 munch
+jsonschema

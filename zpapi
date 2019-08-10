@@ -30,7 +30,7 @@ class Zotero(object):
       action = getattr(self, cmd)
       if not callable(action): continue
 
-      sp = subparsers.add_parser(cmd.replace('_', '-'), help=action.__doc__)
+      sp = subparsers.add_parser(cmd.replace('_', '-'), description = action.__doc__, help=action.__doc__)
       # when called with an argparser, the command is expected to add relevant parameters and return
       # the command must have a docstring
       action(sp)

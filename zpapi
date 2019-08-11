@@ -17,7 +17,7 @@ class Zotero(object):
   def __init__(self):
     # global parameters for all commands
     self.parser = argparse.ArgumentParser()
-    self.parser.add_argument('--api_key')
+    self.parser.add_argument('--api-key')
     self.parser.add_argument('--config', type=lambda x: x if os.path.exists(x) else self.parser.error(f'config file {x} does not exist'))
     self.parser.add_argument('--library-id', type=int)
     self.parser.add_argument('--library-type', choices=['user', 'group'])

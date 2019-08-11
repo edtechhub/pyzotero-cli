@@ -108,7 +108,7 @@ class Zotero(object):
       if self.args.library_type == 'group':
         self.parser.error('no library ID specified')
       else:
-        self.parser.error('no user ID specified')
+        self.args.library_id = zotero.Zotero(1, 'user', self.args.api_key).key_info()['userID']
 
     self.zotero = zotero.Zotero(self.args.library_id, self.args.library_type, self.args.api_key)
 

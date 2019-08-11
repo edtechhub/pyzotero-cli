@@ -21,7 +21,7 @@ class Zotero(object):
     self.parser.add_argument('--config', type=lambda x: x if os.path.exists(x) else self.parser.error(f'config file {x} does not exist'))
     self.parser.add_argument('--library-id', type=int)
     self.parser.add_argument('--library-type', choices=['user', 'group'])
-    self.parser.add_argument('--indent', type=int, default=2)
+    self.parser.add_argument('--indent', type=int)
 
     subparsers = self.parser.add_subparsers(help='commands', dest='command', required=True)
     # add all methods that do not start with _ as a command
@@ -100,6 +100,9 @@ class Zotero(object):
 
       setattr(self.args, action.dest, value)
 
+    # using default=2 above prevents the overrides from being picked up
+
+    if not self.args.indent: self.args.indent = 2
     if not self.args.api_key: self.parser.error('no API key provided')
 
     if not self.args.library_type: self.parser.error('no library type provided')

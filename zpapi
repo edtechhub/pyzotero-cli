@@ -204,14 +204,10 @@ class Zotero(object):
       return
 
     args = json.loads(self.args.filter) if self.args.filter else {}
-    items = self.zotero.items(**args)
-    if not 'limit' in args: items = self.zotero.everything(items)
+    tags = self.zotero.tags(**args)
+    if not 'limit' in args: tags = self.zotero.everything(tags)
 
-    if self.args.count:
-      for tag in items:
-        print(f'{tag} {self.zotero.num_tagitems(tag)}')
-    else:
-      print(json.dumps(items, indent=self.args.indent))
+    print(json.dumps(tags, indent=self.args.indent))
 
   def searches(self, argparser=None):
     """TODO: document"""

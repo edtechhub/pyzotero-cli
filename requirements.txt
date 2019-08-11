@@ -1,0 +1,7 @@
+pyzotero
+toml
+python-dotenv
+munch
+jsonschema
+pyOpenSSL
+idna

@@ -57,7 +57,7 @@ class Zotero(object):
 
       # first try explicit config
       if value is None and self.args.config:
-        value = self.config.get(self.args.command, {}).get(action.dest, self.config.get(action.dest))
+        value = self.config.get(self.args.command, {}).get(action.dest.replace('_', '-'), self.config.get(action.dest.replace('_', '-')))
 
       # next, ENV vars. Also picks up from .env
       if value is None:

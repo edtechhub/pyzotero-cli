@@ -1,3 +1,4 @@
 *.ini
 *.toml
 *.swp
+node_modules

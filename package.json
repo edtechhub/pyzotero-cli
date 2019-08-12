@@ -1,0 +1,49 @@
+{
+  "name": "zotero-cli",
+  "version": "1.0.0",
+  "description": "Command line for interacting with Zotero libraries",
+  "main": "bin/zotero-cli.js",
+  "preferGlobal": true,
+  "bin": {
+    "zotero-cli": "./bin/zotero-cli.js"
+  },
+  "scripts": {
+    "start": "ts-node bin/zotero-cli.ts",
+    "preversion": "npm test",
+    "postversion": "git push --follow-tags",
+    "test": "tslint -t stylish --project .",
+    "build": "tsc && chmod +x bin/*.js",
+    "prepublishOnly": "npm run build",
+    "go": "npm run build && npm version patch && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edtechhub/zotero-cli.git"
+  },
+  "keywords": [
+    "zotero"
+  ],
+  "author": "Emiliano Heyns",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/edtechhub/zotero-cli/issues"
+  },
+  "homepage": "https://github.com/edtechhub/zotero-cli#readme",
+  "devDependencies": {
+    "@types/node": "^12.7.1",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.3",
+    "ajv": "^6.10.2",
+    "argparse": "^1.0.10",
+    "bluebird": "^3.5.5",
+    "docstring": "^1.1.0",
+    "dotenv": "^8.0.0",
+    "http-link-header": "^1.0.2",
+    "request-promise": "^4.2.4",
+    "zotero": "^0.4.1"
+  }
+}

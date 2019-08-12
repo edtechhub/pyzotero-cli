@@ -344,6 +344,19 @@ class Zotero {
         }
         fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`));
     }
+    async $fields(argparser = null) {
+        if (argparser) {
+            argparser.addArgument('--type');
+            return;
+        }
+        if (this.args.type) {
+            this.show(await this.get('/itemTypeFields', { params: { itemType: this.args.type }, userOrGroupPrefix: false }));
+            this.show(await this.get('/itemTypeCreatorTypes', { params: { itemType: this.args.type }, userOrGroupPrefix: false }));
+        }
+        else {
+            this.show(await this.get('/itemFields', { userOrGroupPrefix: false }));
+        }
+    }
 }
 (new Zotero).run().catch(err => {
     console.log('error:', err);

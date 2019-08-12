@@ -194,7 +194,6 @@ class Zotero {
     return (await this.get(uri, { resolveWithFullResponse: true, params })).headers['total-results']
   }
 
-
   show(v) {
     console.log(JSON.stringify(v, null, this.args.indent))
   }
@@ -361,6 +360,20 @@ class Zotero {
     }
 
     fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`))
+  }
+
+  async $fields(argparser = null) {
+    if (argparser) {
+      argparser.addArgument('--type')
+      return
+    }
+
+    if (this.args.type) {
+      this.show(await this.get('/itemTypeFields', { params: { itemType: this.args.type }, userOrGroupPrefix: false } ))
+      this.show(await this.get('/itemTypeCreatorTypes', { params: { itemType: this.args.type }, userOrGroupPrefix: false } ))
+    } else {
+      this.show(await this.get('/itemFields', { userOrGroupPrefix: false } ))
+    }
   }
 
   /* not sure what this is supposed to do

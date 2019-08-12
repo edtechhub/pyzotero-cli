@@ -171,7 +171,6 @@ class Zotero {
         await this['$' + this.args.command.replace(/-/g, '_')]();
     }
     async all(uri, params = {}) {
-        console.log(uri, params);
         let chunk = await this.get(uri, { resolveWithFullResponse: true, params });
         let data = chunk.body;
         let link = chunk.headers.link && LinkHeader.parse(chunk.headers.link).rel('next');
@@ -192,10 +191,9 @@ class Zotero {
             prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`;
         const params = Object.keys(options.params).map(param => {
             let values = options.params[param];
-            if (Array.isArray(values))
+            if (!Array.isArray(values))
                 values = [values];
-            console.log('param:', param, ', values:', values);
-            return values.map(encodeURI).join('&');
+            return values.map(v => `${param}=${encodeURI(v)}`).join('&');
         }).join('&');
         return request({
             uri: `${this.base}${prefix}${uri}${params ? '?' + params : ''}`,
@@ -204,12 +202,15 @@ class Zotero {
             resolveWithFullResponse: options.resolveWithFullResponse,
         });
     }
+    show(v) {
+        console.log(JSON.stringify(v, null, this.args.indent));
+    }
     /// THE COMMANDS ///
     async $key(argparser = null) {
         /** TODO: document */
         if (argparser)
             return;
-        console.log(JSON.stringify(await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false }), null, this.args.indent));
+        this.show(await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false }));
     }
     async $items(argparser = null) {
         /** TODO: document */
@@ -227,8 +228,8 @@ class Zotero {
             return;
         }
         if (this.args.count) {
-            items = this.get('/items', { resolveWithFullResponse: true, params: this.args.filter || {} });
-            console.log(items.headers['Total-Results']);
+            items = await this.get('/items', { resolveWithFullResponse: true, params: this.args.filter || {} });
+            console.log(items.headers['total-results']);
             return;
         }
         const params = this.args.filter || {};
@@ -252,12 +253,12 @@ class Zotero {
                 if (!oneSchema) {
                     validate = validators[item.itemType] = validators[item.itemType] || ajv.compile(JSON.parse(fs.readFileSync(path.join(this.args.validate, `${item.itemType}.json`), 'utf-8')));
                 }
-                if (validate(item))
-                    console.log(JSON.stringify(validate.errors, null, this.args.indent));
+                if (!validate(item))
+                    this.show(validate.errors);
             }
         }
         else {
-            console.log(JSON.stringify(items, null, this.args.indent));
+            this.show(items);
         }
     }
     async $publications(argparser = null) {
@@ -265,36 +266,40 @@ class Zotero {
         if (argparser)
             return;
         const items = await this.get('/publications/items');
-        console.log(JSON.stringify(items, null, this.args.indent));
+        this.show(items);
     }
     async $trash(argparser = null) {
         /** TODO: document */
         if (argparser)
             return;
         const items = await this.get('/items/trash');
-        console.log(JSON.stringify(items, null, this.args.indent));
+        this.show(items);
     }
-    /*
-    def tags(self, argparser=None):
-      """TODO: document"""
-  
-      if argparser:
-        argparser.add_argument('--filter')
-        argparser.add_argument('--count')
-        return
-  
-      args = json.loads(self.args.filter) if self.args.filter else {}
-      tags = self.zotero.tags(**args)
-      if not 'limit' in args: tags = self.zotero.everything(tags)
-  
-      print(json.dumps(tags, indent=self.args.indent))
-    */
+    async $tags(argparser = null) {
+        /** TODO: document */
+        if (argparser) {
+            argparser.addArgument('--filter');
+            argparser.addArgument('--count', { action: 'storeTrue' });
+            return;
+        }
+        const tags = (await this.get('/tags')).map(tag => tag.tag);
+        if (this.args.count) {
+            const params = this.args.filter || {};
+            for (const tag of tags) {
+                const items = await this.get('/items', { resolveWithFullResponse: true, params: Object.assign({}, params, { tag }) });
+                console.log(tag, items.headers['total-results']);
+            }
+        }
+        else {
+            this.show(tags);
+        }
+    }
     async $searches(argparser = null) {
         /** TODO: document */
         if (argparser)
             return;
         const items = await this.get('/searches');
-        console.log(JSON.stringify(items, null, this.args.indent));
+        this.show(items);
     }
 }
 (new Zotero).run().catch(err => {

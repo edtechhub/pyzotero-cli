@@ -318,7 +318,7 @@ class Zotero {
             argparser.addArgument('--count', { action: 'storeTrue' });
             return;
         }
-        const tags = (await this.get('/tags')).map(tag => tag.tag).sort();
+        const tags = (await this.all('/tags')).map(tag => tag.tag).sort();
         if (this.args.count) {
             const params = this.args.filter || {};
             for (const tag of tags) {

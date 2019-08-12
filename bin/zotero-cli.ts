@@ -14,6 +14,10 @@ import * as LinkHeader from 'http-link-header'
 import Ajv = require('ajv')
 const ajv = new Ajv()
 
+function sleep(msecs) {
+  return new Promise(resolve => setTimeout(resolve, msecs))
+}
+
 const arg = new class {
   integer(v) {
     if (isNaN(parseInt(v))) throw new Error(`${JSON.stringify(v)} is not an integer`)
@@ -161,6 +165,8 @@ class Zotero {
 
     let link = chunk.headers.link && LinkHeader.parse(chunk.headers.link).rel('next')
     while (link && link.length && link[0].uri) {
+      if (chunk.headers.backoff) await sleep(parseInt(chunk.headers.backoff) * 1000)
+
       chunk = await request({
         uri: link[0].uri,
         headers: this.headers,

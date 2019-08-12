@@ -11,6 +11,9 @@ const request = require("request-promise");
 const LinkHeader = require("http-link-header");
 const Ajv = require("ajv");
 const ajv = new Ajv();
+function sleep(msecs) {
+    return new Promise(resolve => setTimeout(resolve, msecs));
+}
 const arg = new class {
     integer(v) {
         if (isNaN(parseInt(v)))
@@ -175,6 +178,8 @@ class Zotero {
         let data = chunk.body;
         let link = chunk.headers.link && LinkHeader.parse(chunk.headers.link).rel('next');
         while (link && link.length && link[0].uri) {
+            if (chunk.headers.backoff)
+                await sleep(parseInt(chunk.headers.backoff) * 1000);
             chunk = await request({
                 uri: link[0].uri,
                 headers: this.headers,

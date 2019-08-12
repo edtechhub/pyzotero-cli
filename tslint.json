@@ -31,7 +31,7 @@
           "private-instance-method"
         ]
       }],
-      "no-magic-numbers": [true, -1, 0, 1, 2],
+      "no-magic-numbers": [true, -1, 0, 1, 2, 1000],
       "prefer-for-of": true,
       "no-duplicate-variable": true,
       "no-string-throw": true,

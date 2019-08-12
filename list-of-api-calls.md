@@ -113,7 +113,7 @@ I don't know what this means
 ## Zotero.tags([search/request parameters])
 
 * Returns a library’s tags
-* status: IMPLEMENTED, not working as expected.
+* status: implemented
     
 ## Zotero.item_tags(itemID[, search/request parameters])
 

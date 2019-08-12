@@ -209,6 +209,16 @@ class Zotero {
     this.show(await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false }))
   }
 
+  async $collection(argparser = null) {
+    if (argparser) {
+      argparser.addArgument('--key', { required: true })
+      argparser.addArgument('--tags', { action: 'storeTrue' })
+      return
+    }
+
+    this.show(await this.get(`/collections/${this.args.key}${this.args.tags ? '/tags' : ''}`))
+  }
+
   async $collections(argparser = null) {
     if (argparser) {
       argparser.addArgument('--top', { action: 'storeTrue' })

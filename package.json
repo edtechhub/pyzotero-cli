@@ -14,7 +14,8 @@
     "test": "tslint -t stylish --project .",
     "build": "tsc && chmod +x bin/*.js",
     "prepublishOnly": "npm run build",
-    "go": "npm run build && npm version patch && npm publish"
+    "go": "npm run build && npm version patch && npm publish",
+    "fixed": "npm test && npm run build && git add bin && git commit -m \"fixes #$FIXED\" && git push"
   },
   "repository": {
     "type": "git",

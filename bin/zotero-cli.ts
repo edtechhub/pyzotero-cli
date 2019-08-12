@@ -160,8 +160,13 @@ class Zotero {
     let data = chunk.body
 
     let link = chunk.headers.link && LinkHeader.parse(chunk.headers.link).rel('next')
-    while (link && link.uri) {
-      chunk = await this.get(link.uri, { resolveWithFullResponse: true, params })
+    while (link && link.length && link[0].uri) {
+      chunk = await request({
+        uri: link[0].uri,
+        headers: this.headers,
+        json: true,
+        resolveWithFullResponse: true,
+      })
       data = data.concat(chunk.body)
       link = chunk.headers.link && LinkHeader.parse(chunk.headers.link).rel('next')
     }
@@ -195,7 +200,7 @@ class Zotero {
   }
 
   show(v) {
-    console.log(JSON.stringify(v, null, this.args.indent))
+    console.log(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
   }
 
   /// THE COMMANDS ///

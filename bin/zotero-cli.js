@@ -174,8 +174,13 @@ class Zotero {
         let chunk = await this.get(uri, { resolveWithFullResponse: true, params });
         let data = chunk.body;
         let link = chunk.headers.link && LinkHeader.parse(chunk.headers.link).rel('next');
-        while (link && link.uri) {
-            chunk = await this.get(link.uri, { resolveWithFullResponse: true, params });
+        while (link && link.length && link[0].uri) {
+            chunk = await request({
+                uri: link[0].uri,
+                headers: this.headers,
+                json: true,
+                resolveWithFullResponse: true,
+            });
             data = data.concat(chunk.body);
             link = chunk.headers.link && LinkHeader.parse(chunk.headers.link).rel('next');
         }
@@ -208,7 +213,7 @@ class Zotero {
         return (await this.get(uri, { resolveWithFullResponse: true, params })).headers['total-results'];
     }
     show(v) {
-        console.log(JSON.stringify(v, null, this.args.indent));
+        console.log(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'));
     }
     /// THE COMMANDS ///
     async $key(argparser = null) {

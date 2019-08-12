@@ -24,12 +24,18 @@ Also see https://github.com/urschrei/pyzotero/issues/92 and https://forums.zoter
 
 ## node
 
-```
-run `npm install`
-run `npm start -- <your args>` (e.g. `npm start -- tags --count`)
-```
 
-for compiled JS:
+run 
+```
+npm install
+```
+run 
+```
+npm start -- <your args>
+```
+(e.g. `npm start -- tags --count`)
+
+### for compiled JS:
 
 ```
 npm run build

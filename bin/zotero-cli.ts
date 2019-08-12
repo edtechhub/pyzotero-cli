@@ -251,7 +251,7 @@ class Zotero {
           validate = validators[item.itemType] = validators[item.itemType] || ajv.compile(JSON.parse(fs.readFileSync(path.join(this.args.validate, `${item.itemType}.json`), 'utf-8')))
         }
 
-        if (validate(item)) console.log(JSON.stringify(validate.errors, null, this.args.indent))
+        if (!validate(item)) console.log(JSON.stringify(validate.errors, null, this.args.indent))
       }
 
     } else {

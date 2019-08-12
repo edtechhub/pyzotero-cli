@@ -186,6 +186,8 @@ class Zotero {
             options.userOrGroupPrefix = true;
         if (typeof options.params === 'undefined')
             options.params = {};
+        if (typeof options.json === 'undefined')
+            options.json = true;
         let prefix = '';
         if (options.userOrGroupPrefix)
             prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`;
@@ -198,7 +200,7 @@ class Zotero {
         return request({
             uri: `${this.base}${prefix}${uri}${params ? '?' + params : ''}`,
             headers: this.headers,
-            json: true,
+            json: options.json,
             resolveWithFullResponse: options.resolveWithFullResponse,
         });
     }
@@ -222,6 +224,7 @@ class Zotero {
             argparser.addArgument('--count', { action: 'storeTrue' });
             argparser.addArgument('--all', { action: 'storeTrue' });
             argparser.addArgument('--filter', { type: arg.json });
+            argparser.addArgument('--collection');
             argparser.addArgument('--top', { action: 'storeTrue' });
             argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype' });
             return;
@@ -230,19 +233,20 @@ class Zotero {
             this.parser.error('--count cannot be combined with --validate');
             return;
         }
+        const collection = this.args.collection ? `/collections/${this.args.collection}` : '';
         if (this.args.count) {
-            console.log(await this.count('/items', this.args.filter || {}));
+            console.log(await this.count(`${collection}/items`, this.args.filter || {}));
             return;
         }
         const params = this.args.filter || {};
         if (this.args.top) {
-            items = await this.get('/items/top', { params });
+            items = await this.get(`${collection}/items/top`, { params });
         }
         else if (params.limit) {
-            items = await this.get('/items', { params });
+            items = await this.get(`${collection}/items`, { params });
         }
         else {
-            items = await this.all('/items', params);
+            items = await this.all(`${collection}/items`, params);
         }
         if (this.args.validate) {
             if (!fs.existsSync(this.args.validate))
@@ -316,6 +320,14 @@ class Zotero {
             return;
         const items = await this.get('/searches');
         this.show(items);
+    }
+    async $attachment(argparser = null) {
+        if (argparser) {
+            argparser.addArgument('--key', { required: true });
+            argparser.addArgument('--save', { required: true });
+            return;
+        }
+        fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`));
     }
 }
 (new Zotero).run().catch(err => {

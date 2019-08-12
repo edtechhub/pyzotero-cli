@@ -344,6 +344,11 @@ class Zotero {
         }
         fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`));
     }
+    async $types(argparser = null) {
+        if (argparser)
+            return;
+        this.show(await this.get('/itemTypes', { userOrGroupPrefix: false }));
+    }
     async $fields(argparser = null) {
         if (argparser) {
             argparser.addArgument('--type');

@@ -218,9 +218,11 @@ class Zotero {
         this.show(await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false }));
     }
     async $collections(argparser = null) {
-        if (argparser)
+        if (argparser) {
+            argparser.addArgument('--top', { action: 'storeTrue' });
             return;
-        this.show(await this.get('/collections'));
+        }
+        this.show(await this.get(`/collections${this.args.top ? '/top' : ''}`));
     }
     async $items(argparser = null) {
         /** TODO: document */

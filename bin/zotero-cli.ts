@@ -210,9 +210,12 @@ class Zotero {
   }
 
   async $collections(argparser = null) {
-    if (argparser) return
+    if (argparser) {
+      argparser.addArgument('--top', { action: 'storeTrue' })
+      return
+    }
 
-    this.show(await this.get('/collections'))
+    this.show(await this.get(`/collections${this.args.top ? '/top' : ''}`))
   }
 
   async $items(argparser = null) {

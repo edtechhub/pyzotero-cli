@@ -83,12 +83,12 @@ I don't know what this means
 ## Zotero.collections([search/request parameters])
 
 * Returns a library’s collections. This includes subcollections.
-* status: PLEASE IMPLEMENT
+* status: implemented
 
 ## Zotero.collections_top([search/request parameters])
 
 * Returns a library’s top-level collections.
-* status: PLEASE IMPLEMENT
+* status: implemented
 
 ## Zotero.collection(collectionID[, search/request parameters])
 

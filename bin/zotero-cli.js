@@ -38,7 +38,7 @@ class Zotero {
             'User-Agent': 'Zotero-CLI',
             'Zotero-API-Version': '3',
         };
-        /*
+        /* not sure what this is supposed to do
         def saved_search(self, argparser=None):
           """TODO: document"""
       
@@ -202,6 +202,9 @@ class Zotero {
             resolveWithFullResponse: options.resolveWithFullResponse,
         });
     }
+    async count(uri, params = {}) {
+        return (await this.get(uri, { resolveWithFullResponse: true, params })).headers['total-results'];
+    }
     show(v) {
         console.log(JSON.stringify(v, null, this.args.indent));
     }
@@ -228,8 +231,7 @@ class Zotero {
             return;
         }
         if (this.args.count) {
-            items = await this.get('/items', { resolveWithFullResponse: true, params: this.args.filter || {} });
-            console.log(items.headers['total-results']);
+            console.log(await this.count('/items', this.args.filter || {}));
             return;
         }
         const params = this.args.filter || {};
@@ -282,12 +284,11 @@ class Zotero {
             argparser.addArgument('--count', { action: 'storeTrue' });
             return;
         }
-        const tags = (await this.get('/tags')).map(tag => tag.tag);
+        const tags = (await this.get('/tags')).map(tag => tag.tag).sort();
         if (this.args.count) {
             const params = this.args.filter || {};
             for (const tag of tags) {
-                const items = await this.get('/items', { resolveWithFullResponse: true, params: Object.assign({}, params, { tag }) });
-                console.log(tag, items.headers['total-results']);
+                console.log(tag, await this.count('/items', Object.assign({}, params, { tag })));
             }
         }
         else {

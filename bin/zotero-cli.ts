@@ -264,6 +264,23 @@ class Zotero {
     }
   }
 
+  async $item(argparser = null) {
+    if (argparser) {
+      argparser.addArgument('--key', { required: true })
+      argparser.addArgument('--children', { action: 'storeTrue' })
+      argparser.addArgument('--filter', { type: arg.json })
+      return
+    }
+
+    const params = this.args.filter || {}
+
+    if (this.args.children) {
+      this.show(await this.get(`/items/${this.args.key}/children`, { params }))
+    } else {
+      this.show(await this.get(`/items/${this.args.key}`, { params }))
+    }
+  }
+
   async $publications(argparser = null) {
     /** TODO: document */
 

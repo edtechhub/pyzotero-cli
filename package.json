@@ -39,7 +39,6 @@
     "@iarna/toml": "^2.2.3",
     "ajv": "^6.10.2",
     "argparse": "^1.0.10",
-    "bluebird": "^3.5.5",
     "docstring": "^1.1.0",
     "dotenv": "^8.0.0",
     "http-link-header": "^1.0.2",

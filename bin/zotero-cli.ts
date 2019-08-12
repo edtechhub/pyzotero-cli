@@ -8,10 +8,6 @@ import { parse as TOML } from '@iarna/toml'
 import fs = require('fs')
 import path = require('path')
 
-import Promise = require('bluebird')
-import zotero = require('zotero')
-zotero.promisify(Promise.promisify.bind(Promise))
-
 import request = require('request-promise')
 import * as LinkHeader from 'http-link-header'
 

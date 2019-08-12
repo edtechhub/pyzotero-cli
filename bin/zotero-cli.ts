@@ -250,7 +250,7 @@ class Zotero {
     const collection = this.args.collection ? `/collections/${this.args.collection}` : ''
 
     if (this.args.count) {
-      console.log(await this.count(`${collection}/items`, this.args.filter || {}))
+      console.log(await this.count(`${collection}/items${this.args.top ? '/top' : ''}`, this.args.filter || {}))
       return
     }
 

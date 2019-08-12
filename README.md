@@ -21,3 +21,15 @@ Install requirements
 WORK IN PROGRESS!
 
 Also see https://github.com/urschrei/pyzotero/issues/92 and https://forums.zotero.org/discussion/76943/pyzotero-more-examples-and-command-line-interface#latest
+
+## node
+
+run `npm install`
+run `npm start -- <your args>` (e.g. `npm start -- tags --count`)
+
+for compiled JS:
+
+```
+npm run build
+./bin/zotero-cli.js tags --count
+```

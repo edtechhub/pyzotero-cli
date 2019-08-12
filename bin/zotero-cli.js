@@ -82,7 +82,7 @@ class Zotero {
         }
         this.args = this.parser.parseArgs();
         // pick up config
-        const config = this.args.config || 'zpapi.toml';
+        const config = this.args.config || 'zotero-cli.toml';
         this.config = fs.existsSync(config) ? toml_1.parse(fs.readFileSync(config, 'utf-8')) : {};
         // expand selected command
         const options = [].concat.apply([], this.parser._actions.map(action => action.dest === 'command' ? action.choices[this.args.command] : [action]));

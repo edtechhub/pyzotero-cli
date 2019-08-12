@@ -69,7 +69,7 @@ class Zotero {
     this.args = this.parser.parseArgs()
 
     // pick up config
-    const config = this.args.config || 'zpapi.toml'
+    const config = this.args.config || 'zotero-cli.toml'
     this.config = fs.existsSync(config) ? TOML(fs.readFileSync(config, 'utf-8')) : {}
 
     // expand selected command

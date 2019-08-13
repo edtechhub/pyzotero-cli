@@ -424,6 +424,7 @@ class Zotero {
 
     if (this.args.template) {
       this.show(await this.get('/items/new', { userOrGroupPrefix: false, params: { itemType: this.args.template } }))
+      return
     }
 
     if (!this.args.items.length) this.parser.error('Need at least one item to create')
@@ -435,7 +436,7 @@ class Zotero {
   async $replace_item(argparser = null) {
     if (argparser) {
       argparser.addArgument('--key', { required: true })
-      argparser.addArgument('item', { nargs: 1, required: true })
+      argparser.addArgument('item', { nargs: 1 })
       return
     }
 
@@ -447,7 +448,7 @@ class Zotero {
   async $get(argparser = null) {
     if (argparser) {
       argparser.addArgument('--root', { action: 'storeTrue' })
-      argparser.addArgument('uri', { nargs: '+', required: true })
+      argparser.addArgument('uri', { nargs: '+' })
       return
     }
 

@@ -24,6 +24,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 
 # Searches
 (Note: Only search metadata is currently available, not search results.)
+
 | URI | Description | Command |
 |---|---|---|
 |&lt;prefix>/searches	| All saved searches in the library | searches |

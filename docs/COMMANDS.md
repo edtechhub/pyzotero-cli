@@ -15,18 +15,18 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 |---|---|---|
 | &lt;prefix>/items | All items in the library, excluding trashed items | items |
 | &lt;prefix>/items/top | Top-level items in the library, excluding trashed items | items --top |
-| &lt;prefix>/items/trash | Items in the trash | items --trash |
-| &lt;prefix>/items/&lt;itemKey> | A specific item in the library | items --key ABC |
-| &lt;prefix>/items/&lt;itemKey>/children | Child items under a specific item | items children |
-| &lt;prefix>/publications/items | Items in My Publications | items --publications |
-| &lt;prefix>/collections/&lt;collectionKey>/items | Items within a specific collection in the library | |
-| &lt;prefix>/collections/&lt;collectionKey>/items/top | Top-level items within a specific collection in the library | |
+| &lt;prefix>/items/trash | Items in the trash | trash |
+| &lt;prefix>/items/&lt;itemKey> | A specific item in the library | item --key ABC |
+| &lt;prefix>/items/&lt;itemKey>/children | Child items under a specific item | item --key ABC --children |
+| &lt;prefix>/publications/items | Items in My Publications | publications |
+| &lt;prefix>/collections/&lt;collectionKey>/items | Items within a specific collection in the library | items --collection ABC|
+| &lt;prefix>/collections/&lt;collectionKey>/items/top | Top-level items within a specific collection in the library | items  --collection --top |
 
 # Searches
 (Note: Only search metadata is currently available, not search results.)
 | URI | Description | Command |
 |---|---|---|
-|&lt;prefix>/searches	| All saved searches in the library | |
+|&lt;prefix>/searches	| All saved searches in the library | searches |
 |&lt;prefix>/searches/<searchKey>	| A specific saved search in the library | |
 
 # Tags
@@ -48,3 +48,10 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 |---|---|---|
 | /keys/&lt;key> | The user id and privileges of the given API key.Use the DELETE HTTP method to delete the key. This should generally be done only by a client that created the key originally using OAuth. | key |
 | /users/&lt;userID>/groups | The set of groups the current API key has access to, including public groups the key owner belongs to even if the key doesn't have explicit permissions for them. | |
+
+# types
+
+```
+zotero-cli types
+zotero-cli fields --type=book
+```

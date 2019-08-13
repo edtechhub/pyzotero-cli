@@ -421,6 +421,17 @@ class Zotero {
     }
   }
 
+  async $get(argparser = null) {
+    if (argparser) {
+      argparser.addArgument('--root', { action: 'storeTrue' })
+      argparser.addArgument('uri', { nargs: '*', required: true })
+      return
+    }
+
+    for (const uri of this.args.uri) {
+      this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root })
+    }
+  }
   /* not sure what this is supposed to do
   def saved_search(self, argparser=None):
     """TODO: document"""

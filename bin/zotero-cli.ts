@@ -201,6 +201,17 @@ class Zotero {
     })
   }
 
+  async post(uri, data) {
+    const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
+
+    return request({
+      method: 'POST',
+      uri: `${this.base}${prefix}${uri}`,
+      headers: {...this.headers, 'Content-Type': 'application/json'},
+      body: data,
+    })
+  }
+
   async count(uri, params = {}) {
     return (await this.get(uri, { resolveWithFullResponse: true, params })).headers['total-results']
   }
@@ -390,6 +401,23 @@ class Zotero {
       this.show(await this.get('/itemTypeCreatorTypes', { params: { itemType: this.args.type }, userOrGroupPrefix: false } ))
     } else {
       this.show(await this.get('/itemFields', { userOrGroupPrefix: false } ))
+    }
+  }
+
+  async $create_item(argparser = null) {
+    if (argparser) {
+      argparser.addArgument('--template')
+      argparser.addArgument('items', { nargs: '*' })
+      return
+    }
+
+    if (this.args.template) {
+      this.show(await this.get('/items/new', { userOrGroupPrefix: false, params: { itemType: this.args.template } }))
+    }
+
+    if (!self.args.items.length) parser.error('Need at least one item to create')
+    for (const item of this.args.items) {
+      await this.post('/items', fs.readFileSync(item))
     }
   }
 

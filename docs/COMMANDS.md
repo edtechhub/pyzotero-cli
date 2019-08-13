@@ -56,3 +56,14 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 zotero-cli types
 zotero-cli fields --type=book
 ```
+
+# Item creation
+
+```
+zotero-cli create-item
+```
+
+# Generic get request
+```
+zotero-cli get /apipath
+```

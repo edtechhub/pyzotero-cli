@@ -58,10 +58,13 @@ zotero-cli fields --type=book
 ```
 
 # Item creation
-
+Here is how you use create-item:
 ```
-zotero-cli create-item
+zotero-cli create-item --template book > book.json
+gedit book.json
+zotero-cli create-item book.json
 ```
+For further options, see `zotero-cli create-item --h`.
 
 # Generic get request
 ```

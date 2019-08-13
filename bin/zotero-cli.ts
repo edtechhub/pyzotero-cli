@@ -61,7 +61,7 @@ class Zotero {
 
     const subparsers = this.parser.addSubparsers({ title: 'commands', dest: 'command', required: true })
     // add all methods that do not start with _ as a command
-    for (const cmd of Object.getOwnPropertyNames(Object.getPrototypeOf(this))) {
+    for (const cmd of Object.getOwnPropertyNames(Object.getPrototypeOf(this)).sort()) {
       if (typeof this[cmd] !== 'function' || cmd[0] !== '$') continue
 
       const sp = subparsers.addParser(cmd.slice(1).replace(/_/g, '-'), { description: this[cmd].__doc__, help: this[cmd].__doc__ })
@@ -222,6 +222,18 @@ class Zotero {
       body: data,
     })
   }
+
+  async patch(uri, data) {
+    const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
+
+    return request({
+      method: 'PATCH',
+      uri: `${this.base}${prefix}${uri}`,
+      headers: {...this.headers, 'Content-Type': 'application/json'},
+      body: data,
+    })
+  }
+
 
   async count(uri, params = {}) {
     return (await this.get(uri, { resolveWithFullResponse: true, params })).headers['total-results']
@@ -433,15 +445,16 @@ class Zotero {
     }
   }
 
-  async $replace_item(argparser = null) {
+  async $update_item(argparser = null) {
     if (argparser) {
       argparser.addArgument('--key', { required: true })
+      argparser.addArgument('--replace', { action: 'storeTrue' })
       argparser.addArgument('item', { nargs: 1 })
       return
     }
 
     for (const item of this.args.items) {
-      await this.put(`/items/${this.args.key}`, fs.readFileSync(item))
+      await this[this.args.replace ? 'put' : 'patch'](`/items/${this.args.key}`, fs.readFileSync(item))
     }
   }
 

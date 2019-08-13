@@ -21,7 +21,7 @@
 | &lt;prefix>/collections/&lt;collectionKey>/items | Items within a specific collection in the library | |
 | &lt;prefix>/collections/&lt;collectionKey>/items/top | Top-level items within a specific collection in the library | |
 
-#Searches
+# Searches
 (Note: Only search metadata is currently available, not search results.)
 
 # Tags

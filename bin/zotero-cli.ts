@@ -415,7 +415,7 @@ class Zotero {
       this.show(await this.get('/items/new', { userOrGroupPrefix: false, params: { itemType: this.args.template } }))
     }
 
-    if (!self.args.items.length) parser.error('Need at least one item to create')
+    if (!this.args.items.length) this.parser.error('Need at least one item to create')
     for (const item of this.args.items) {
       await this.post('/items', fs.readFileSync(item))
     }
@@ -429,7 +429,7 @@ class Zotero {
     }
 
     for (const uri of this.args.uri) {
-      this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root })
+      this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root }))
     }
   }
   /* not sure what this is supposed to do

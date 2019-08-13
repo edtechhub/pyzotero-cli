@@ -50,7 +50,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 | /keys/&lt;key> | The user id and privileges of the given API key.Use the DELETE HTTP method to delete the key. This should generally be done only by a client that created the key originally using OAuth. | key |
 | /users/&lt;userID>/groups | The set of groups the current API key has access to, including public groups the key owner belongs to even if the key doesn't have explicit permissions for them. | |
 
-# types
+# Item types and item fields (with localised names) 
 
 ```
 zotero-cli types

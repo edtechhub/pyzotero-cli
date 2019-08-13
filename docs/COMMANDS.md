@@ -70,3 +70,8 @@ For further options, see `zotero-cli create-item --h`.
 ```
 zotero-cli get /apipath
 ```
+
+# Getting attachments
+```
+zotero-cli.ts attachment [-h] --key KEY --save SAVE
+```

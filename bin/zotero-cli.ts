@@ -212,6 +212,17 @@ class Zotero {
     })
   }
 
+  async put(uri, data) {
+    const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
+
+    return request({
+      method: 'PUT',
+      uri: `${this.base}${prefix}${uri}`,
+      headers: {...this.headers, 'Content-Type': 'application/json'},
+      body: data,
+    })
+  }
+
   async count(uri, params = {}) {
     return (await this.get(uri, { resolveWithFullResponse: true, params })).headers['total-results']
   }
@@ -421,10 +432,22 @@ class Zotero {
     }
   }
 
+  async $replace_item(argparser = null) {
+    if (argparser) {
+      argparser.addArgument('--key', { required: true })
+      argparser.addArgument('item', { nargs: 1, required: true })
+      return
+    }
+
+    for (const item of this.args.items) {
+      await this.put(`/items/${this.args.key}`, fs.readFileSync(item))
+    }
+  }
+
   async $get(argparser = null) {
     if (argparser) {
       argparser.addArgument('--root', { action: 'storeTrue' })
-      argparser.addArgument('uri', { nargs: '*', required: true })
+      argparser.addArgument('uri', { nargs: '+', required: true })
       return
     }
 

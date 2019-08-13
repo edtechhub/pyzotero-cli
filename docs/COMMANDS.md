@@ -4,21 +4,21 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 
 | URI | Description | Command |  
 |---|---|---|
-| &lt;prefix>/collections | Collections in the library | |
-| &lt;prefix>/collections/top | Top-level collections in the library | |
-| &lt;prefix>/collections/&lt;collectionKey> | A specific collection in the library | |
+| &lt;prefix>/collections | Collections in the library | collections |
+| &lt;prefix>/collections/top | Top-level collections in the library | collections --top |
+| &lt;prefix>/collections/&lt;collectionKey> | A specific collection in the library | collections --key ABC |
 | &lt;prefix>/collections/&lt;collectionKey>/collections | Subcollections within a specific collection in the library | |
 
 # Items
 
 | URI | Description | Command |
 |---|---|---|
-| &lt;prefix>/items | All items in the library, excluding trashed items | |
-| &lt;prefix>/items/top | Top-level items in the library, excluding trashed items | |
-| &lt;prefix>/items/trash | Items in the trash | |
-| &lt;prefix>/items/&lt;itemKey> | A specific item in the library | |
-| &lt;prefix>/items/&lt;itemKey>/children | Child items under a specific item | |
-| &lt;prefix>/publications/items | Items in My Publications | |
+| &lt;prefix>/items | All items in the library, excluding trashed items | items |
+| &lt;prefix>/items/top | Top-level items in the library, excluding trashed items | items --top |
+| &lt;prefix>/items/trash | Items in the trash | items --trash |
+| &lt;prefix>/items/&lt;itemKey> | A specific item in the library | items --key ABC |
+| &lt;prefix>/items/&lt;itemKey>/children | Child items under a specific item | items children |
+| &lt;prefix>/publications/items | Items in My Publications | items --publications |
 | &lt;prefix>/collections/&lt;collectionKey>/items | Items within a specific collection in the library | |
 | &lt;prefix>/collections/&lt;collectionKey>/items/top | Top-level items within a specific collection in the library | |
 
@@ -32,7 +32,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 # Tags
 | URI | Description | Command |
 |---|---|---|
-| &lt;prefix>/tags | All tags in the library | |
+| &lt;prefix>/tags | All tags in the library | tags |
 | &lt;prefix>/tags/&lt;url+encoded+tag> | Tags of all types matching a specific name | |
 | &lt;prefix>/items/&lt;itemKey>/tags | Tags associated with a specific item | |
 | &lt;prefix>/collections/&lt;collectionKey>/tags | Tags within a specific collection in the library | |

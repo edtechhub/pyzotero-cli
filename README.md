@@ -9,12 +9,22 @@ Then run to run the script:
 ```
 npm start -- <your args>
 ```
-(e.g. `npm start -- tags --count`)
+E.g. 
+```
+npm start -- tags --count
+```
 
-### for compiled JS:
+### For compiled JS:
 
 ```
 npm run build
+```
+Then:
+```
+./bin/zotero-cli.js <your args>
+```
+E.g. 
+```
 ./bin/zotero-cli.js tags --count
 ```
 

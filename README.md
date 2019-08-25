@@ -1,12 +1,11 @@
 # zotero-cli
 ## node
 
-
-run 
+Run the following command to install dependencies 
 ```
 npm install
 ```
-run 
+Then run to run the script: 
 ```
 npm start -- <your args>
 ```

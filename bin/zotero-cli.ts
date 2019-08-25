@@ -53,11 +53,11 @@ class Zotero {
   async run() {
     // global parameters for all commands
     this.parser = new ArgumentParser
-    this.parser.addArgument('--api-key')
-    this.parser.addArgument('--config', { type: arg.file })
-    this.parser.addArgument('--user-id', { type: arg.integer })
-    this.parser.addArgument('--group-id', { type: arg.integer })
-    this.parser.addArgument('--indent', { type: arg.integer })
+    this.parser.addArgument('--api-key', {help: "The API key to access the Zotero API."})
+    this.parser.addArgument('--config', { type: arg.file, help: "Configuration file (toml format). Note that zotero-cli.toml is picked up automatically." })
+    this.parser.addArgument('--user-id', { type: arg.integer, help: "The id of the user library." })
+    this.parser.addArgument('--group-id', { type: arg.integer, help: "The id of the group library." })
+    this.parser.addArgument('--indent', { type: arg.integer, help: "Identation for json output." })
 
     const subparsers = this.parser.addSubparsers({ title: 'commands', dest: 'command', required: true })
     // add all methods that do not start with _ as a command
@@ -180,6 +180,7 @@ class Zotero {
   }
 
   async get(uri, options: { userOrGroupPrefix?: boolean, params?: any, resolveWithFullResponse?: boolean, json?: boolean } = {}) {
+      
     if (typeof options.userOrGroupPrefix === 'undefined') options.userOrGroupPrefix = true
     if (typeof options.params === 'undefined') options.params = {}
     if (typeof options.json === 'undefined') options.json = true
@@ -246,7 +247,7 @@ class Zotero {
   /// THE COMMANDS ///
 
   async $key(argparser = null) {
-    /** TODO: document */
+    /** Show details about this API key. (API: /keys ) */
 
     if (argparser) return
 
@@ -254,9 +255,11 @@ class Zotero {
   }
 
   async $collection(argparser = null) {
+    /** Retrieve information about a specific collection --key KEY (API: /collection/KEY or /collection/KEY/tags)   */
+      
     if (argparser) {
-      argparser.addArgument('--key', { required: true })
-      argparser.addArgument('--tags', { action: 'storeTrue' })
+      argparser.addArgument('--key', { required: true,  help: "The key of the item." })
+      argparser.addArgument('--tags', { action: 'storeTrue', help: "Display present in the collection." })
       return
     }
 
@@ -264,8 +267,10 @@ class Zotero {
   }
 
   async $collections(argparser = null) {
+    /** Retrieve a list of collections. (API: /collections or /collection/top) */
+      
     if (argparser) {
-      argparser.addArgument('--top', { action: 'storeTrue' })
+      argparser.addArgument('--top', { action: 'storeTrue', help: "Show only collection at top level." })
       return
     }
 
@@ -273,16 +278,16 @@ class Zotero {
   }
 
   async $items(argparser = null) {
-    /** TODO: document */
+    /** Retrieve a list of items items from the library, e.g. collection/top. (API: /items/...) */
 
     let items
 
     if (argparser) {
-      argparser.addArgument('--count', { action: 'storeTrue' })
-      argparser.addArgument('--all', { action: 'storeTrue' })
-      argparser.addArgument('--filter', { type: arg.json })
-      argparser.addArgument('--collection')
-      argparser.addArgument('--top', { action: 'storeTrue' })
+      argparser.addArgument('--count', { action: 'storeTrue', help: "TODO: document" })
+      argparser.addArgument('--all', { action: 'storeTrue', help: "TODO: document" })
+      argparser.addArgument('--filter', { type: arg.json, help: "TODO: document" })
+      argparser.addArgument('--collection', {help: "TODO: document"})
+      argparser.addArgument('--top', { action: 'storeTrue', help: "TODO: document" })
       argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype' })
       return
     }
@@ -332,10 +337,11 @@ class Zotero {
   }
 
   async $item(argparser = null) {
+    /** Retrieve children for item --key KEY. (API: /items/KEY/ or /items/KEY/children) */
     if (argparser) {
-      argparser.addArgument('--key', { required: true })
-      argparser.addArgument('--children', { action: 'storeTrue' })
-      argparser.addArgument('--filter', { type: arg.json })
+      argparser.addArgument('--key', { required: true,  help: "The key of the item." })
+      argparser.addArgument('--children', { action: 'storeTrue', help: "TODO: document" })
+      argparser.addArgument('--filter', { type: arg.json, help: "TODO: document" })
       return
     }
 
@@ -349,7 +355,7 @@ class Zotero {
   }
 
   async $publications(argparser = null) {
-    /** TODO: document */
+    /** Return a list of items in publications (user library only). (API: /publications/items) */
 
     if (argparser) return
 
@@ -358,7 +364,7 @@ class Zotero {
   }
 
   async $trash(argparser = null) {
-    /** TODO: document */
+    /** Return a list of items in the trash. */
 
     if (argparser) return
 
@@ -367,11 +373,11 @@ class Zotero {
   }
 
   async $tags(argparser = null) {
-    /** TODO: document */
+    /** Return a list of tags in the library. Options to filter and count tags. (API: /tags) */
 
     if (argparser) {
-      argparser.addArgument('--filter')
-      argparser.addArgument('--count', { action: 'storeTrue' })
+      argparser.addArgument('--filter', {help: "TODO: document"})
+      argparser.addArgument('--count', { action: 'storeTrue', help: "TODO: document" })
       return
     }
 
@@ -389,7 +395,7 @@ class Zotero {
   }
 
   async $searches(argparser = null) {
-    /** TODO: document */
+    /** Return a list of the saved searches of the library. (API: /searches)*/
 
     if (argparser) return
 
@@ -398,9 +404,11 @@ class Zotero {
   }
 
   async $attachment(argparser = null) {
+    /** Retrieve/save attachments for the item specified with --key KEY. (API: /items/KEY/file) */
+
     if (argparser) {
-      argparser.addArgument('--key', { required: true })
-      argparser.addArgument('--save', { required: true })
+      argparser.addArgument('--key', { required: true,  help: "The key of the item."})
+      argparser.addArgument('--save', { required: true, help: "TODO: document"})
       return
     }
 
@@ -408,14 +416,18 @@ class Zotero {
   }
 
   async $types(argparser = null) {
+    /** Retrieve a list of items types available in Zotero. (API: /itemTypes) */
+
     if (argparser) return
 
     this.show(await this.get('/itemTypes', { userOrGroupPrefix: false } ))
   }
 
   async $fields(argparser = null) {
+    /** Retrieve a template with the fields for --type TYPE (API: /itemTypeFields, /itemTypeCreatorTypes) or all item fields (API: /itemFields). Note that to retrieve a template, use 'create-item --template TYPE' rather than this command. */
+
     if (argparser) {
-      argparser.addArgument('--type')
+	argparser.addArgument('--type', {help: "Display fields types for TYPE."})
       return
     }
 
@@ -428,9 +440,11 @@ class Zotero {
   }
 
   async $create_item(argparser = null) {
+    /** Create a new item or items. (API: /items/new) You can retrieve a template with the --template option.  */
+
     if (argparser) {
-      argparser.addArgument('--template')
-      argparser.addArgument('items', { nargs: '*' })
+      argparser.addArgument('--template', {help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'."})
+      argparser.addArgument('items', { nargs: '*', help: "Json files for the items to be created." })
       return
     }
 
@@ -440,16 +454,20 @@ class Zotero {
     }
 
     if (!this.args.items.length) this.parser.error('Need at least one item to create')
-    for (const item of this.args.items) {
-      await this.post('/items', fs.readFileSync(item))
+      for (const item of this.args.items) {
+	var op = "";
+	op = await this.post('/items', fs.readFileSync(item));
+	console.log(op);
     }
   }
 
   async $update_item(argparser = null) {
+    /** Update/replace an item (--key KEY), either update (API: patch /items/KEY) or replacing (using --replace, API: put /items/KEY). */
+
     if (argparser) {
-      argparser.addArgument('--key', { required: true })
-      argparser.addArgument('--replace', { action: 'storeTrue' })
-      argparser.addArgument('item', { nargs: 1 })
+      argparser.addArgument('--key', { required: true,  help: "The key of the item." })
+      argparser.addArgument('--replace', { action: 'storeTrue', help: "TODO: document" })
+      argparser.addArgument('items', { nargs: 1, help: "TODO: document" })
       return
     }
 
@@ -459,9 +477,11 @@ class Zotero {
   }
 
   async $get(argparser = null) {
+    /** Make a direct query to the API. */
+
     if (argparser) {
-      argparser.addArgument('--root', { action: 'storeTrue' })
-      argparser.addArgument('uri', { nargs: '+' })
+      argparser.addArgument('--root', { action: 'storeTrue', help: "TODO: document" })
+      argparser.addArgument('uri', { nargs: '+', help: "TODO: document" })
       return
     }
 
@@ -474,7 +494,7 @@ class Zotero {
     """TODO: document"""
 
     if argparser:
-      argparser.add_argument('files', nargs='*')
+      argparser.add_argument('files', nargs='*', help: "TODO: document")
       return
 
     if not self.args.files or len(self.args.files) == 0:

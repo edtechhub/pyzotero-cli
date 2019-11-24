@@ -223,13 +223,16 @@ class Zotero {
     })
   }
 
-  async patch(uri, data) {
+  async patch(uri, data, version?: number) {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
+
+    const headers = {...this.headers, 'Content-Type': 'application/json'}
+    if (typeof version !== 'undefined') headers['If-Unmodified-Since-Version'] = version
 
     return request({
       method: 'PATCH',
       uri: `${this.base}${prefix}${uri}`,
-      headers: {...this.headers, 'Content-Type': 'application/json'},
+      headers,
       body: data,
     })
   }
@@ -258,6 +261,30 @@ class Zotero {
     if (argparser) {
       argparser.addArgument('--key', { required: true,  help: 'The key of the item.' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display present in the collection.' })
+      argparser.addArgument('--add', { action: 'storeTrue', help: 'Add items to this collection.' })
+      argparser.addArgument('items', { nargs: '*'})
+      return
+    }
+
+    if (this.args.tags && this.args.add) {
+      this.parser.error('--tags cannot be combined with --add')
+      return
+    }
+    if (this.args.add && !this.args.items.length) {
+      this.parser.error('--add requires item keys')
+      return
+    }
+    if (!this.args.add && this.args.items.length) {
+      this.parser.error('unexpected item keys')
+      return
+    }
+
+    if (this.args.add) {
+      for (const itemKey of this.args.items) {
+        const item = await this.get(`/items/${itemKey}`)
+        if (item.collections.includes(this.args.key)) continue
+        await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.collections.concat(this.args.key) }), item.version)
+      }
       return
     }
 

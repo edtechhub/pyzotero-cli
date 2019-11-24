@@ -31,8 +31,8 @@
   },
   "homepage": "https://github.com/edtechhub/zotero-cli#readme",
   "devDependencies": {
-    "@types/node": "^12.12.7",
-    "ts-node": "^8.5.0",
+    "@types/node": "^12.12.12",
+    "ts-node": "^8.5.2",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
   },
@@ -43,6 +43,7 @@
     "docstring": "^1.1.0",
     "dotenv": "^8.2.0",
     "http-link-header": "^1.0.2",
+    "request": "^2.88.0",
     "request-promise": "^4.2.5"
   }
 }

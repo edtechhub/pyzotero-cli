@@ -2,3 +2,4 @@
 *.toml
 *.swp
 node_modules
+*.js

@@ -45,5 +45,12 @@
     "http-link-header": "^1.0.2",
     "request": "^2.88.0",
     "request-promise": "^4.2.5"
-  }
+  },
+  "files": [
+    "package.json",
+    "bin/zotero-cli.d.ts",
+    "bin/zotero-cli.js",
+    "docs/COMMANDS.md",
+    "README.md"
+  ]
 }

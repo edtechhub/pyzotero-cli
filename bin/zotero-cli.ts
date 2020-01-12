@@ -282,8 +282,8 @@ class Zotero {
     if (this.args.add) {
       for (const itemKey of this.args.items) {
         const item = await this.get(`/items/${itemKey}`)
-        if (item.collections.includes(this.args.key)) continue
-        await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.collections.concat(this.args.key) }), item.version)
+        if (item.data.collections.includes(this.args.key)) continue
+        await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.data.collections.concat(this.args.key) }), item.version)
       }
       return
     }

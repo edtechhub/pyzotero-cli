@@ -261,7 +261,7 @@ class Zotero {
     if (argparser) {
       argparser.addArgument('--key', { required: true,  help: 'The key of the item.' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
-      argparser.addArgument('--items', { action: 'storeTrue', help: 'Display items present in the collection.' })
+      argparser.addArgument('--getitems', { action: 'storeTrue', help: 'Display items present in the collection.' })
       argparser.addArgument('--add', { action: 'storeTrue', help: 'Add items to this collection.' })
       argparser.addArgument('items', { nargs: '*'})
       return
@@ -271,12 +271,12 @@ class Zotero {
       this.parser.error('--tags cannot be combined with --add')
       return
     }
-    if (this.args.items && this.args.add) {
-      this.parser.error('--items cannot be combined with --add')
+    if (this.args.getitems && this.args.add) {
+      this.parser.error('--getitems cannot be combined with --add')
       return
     }
-    if (this.args.items && this.args.tags) {
-      this.parser.error('--items and --tags cannot be combined.')
+    if (this.args.getitems && this.args.tags) {
+      this.parser.error('--getitems and --tags cannot be combined.')
       return
     }
     if (this.args.add && !this.args.items.length) {
@@ -296,7 +296,7 @@ class Zotero {
       }
       return
     }
-    if (this.args.items) {
+    if (this.args.getitems) {
         this.show(await this.get(`/collections/${this.args.key}/items`))
     } else {
         this.show(await this.get(`/collections/${this.args.key}${this.args.tags ? '/tags' : ''}`))

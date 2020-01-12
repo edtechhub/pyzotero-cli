@@ -324,7 +324,7 @@ class Zotero {
       argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--all', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
-      argparser.addArgument('--collection', {help: 'TODO: document'})
+      argparser.addArgument('--collection', {help: 'Retrive list of items for collection'})
       argparser.addArgument('--top', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype' })
       return

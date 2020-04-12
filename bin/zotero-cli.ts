@@ -59,7 +59,8 @@ class Zotero {
     this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
     this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
     this.parser.addArgument('--indent', { type: arg.integer, help: 'Identation for json output.' })
-
+    this.parser.addArgument('--verbose', { type: arg.integer, help: 'Be more verbose.' })
+      
     const subparsers = this.parser.addSubparsers({ title: 'commands', dest: 'command', required: true })
     // add all methods that do not start with _ as a command
     for (const cmd of Object.getOwnPropertyNames(Object.getPrototypeOf(this)).sort()) {
@@ -203,6 +204,8 @@ class Zotero {
       return values.map(v => `${param}=${encodeURI(v)}`).join('&')
     }).join('&')
 
+    if (this.args.verbose) console.log("GET URI = "+`${this.base}${prefix}${uri}${params ? '?' + params : ''}`);
+      
     return request({
       uri: `${this.base}${prefix}${uri}${params ? '?' + params : ''}`,
       headers: this.headers,
@@ -214,6 +217,8 @@ class Zotero {
   async post(uri, data) {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
+    if (this.args.verbose) console.log("POST URI = "+`${this.base}${prefix}${uri}`);
+      
     return request({
       method: 'POST',
       uri: `${this.base}${prefix}${uri}`,
@@ -225,6 +230,8 @@ class Zotero {
   async put(uri, data) {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
+    if (this.args.verbose) console.log("PUT URI = "+`${this.base}${prefix}${uri}`);
+      
     return request({
       method: 'PUT',
       uri: `${this.base}${prefix}${uri}`,
@@ -239,6 +246,8 @@ class Zotero {
     const headers = {...this.headers, 'Content-Type': 'application/json'}
     if (typeof version !== 'undefined') headers['If-Unmodified-Since-Version'] = version
 
+    if (this.args.verbose) console.log("PATCH URI: "+`${this.base}${prefix}${uri}`);
+      
     return request({
       method: 'PATCH',
       uri: `${this.base}${prefix}${uri}`,
@@ -252,7 +261,7 @@ class Zotero {
   }
 
   show(v) {
-    console.log(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
+      console.log(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
   }
 
   /// THE COMMANDS ///
@@ -522,7 +531,7 @@ class Zotero {
     }
 
     for (const uri of this.args.uri) {
-      this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root }))
+	this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root }))
     }
   }
 }

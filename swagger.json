@@ -1,0 +1,162 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "1.0.0",
+    "title" : "Zotero API",
+    "description" : "Zotero API"
+  },
+  "schemes" : [ "https" ],
+  "securityDefinitions" : {
+    "UserSecurity" : {
+      "type" : "basic"
+    }
+  },
+  "security" : [ {
+    "UserSecurity" : [ ]
+  } ],
+  "paths" : {
+    "/{userOrGroup}/{id}/collections" : {
+      "get" : {
+        "description" : "Collections in the library",
+        "parameters" : [ {
+          "$ref" : "#/parameters/UserOrGroup"
+        }, {
+          "$ref" : "#/parameters/UserOrGroupID"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successfully returned a list of collections",
+            "schema" : {
+              "$ref" : "#/definitions/Collection"
+            }
+          }
+        }
+      }
+    },
+    "/{userOrGroup}/{id}/collections/top" : {
+      "get" : {
+        "description" : "Top-level collections in the library",
+        "parameters" : [ {
+          "$ref" : "#/parameters/UserOrGroup"
+        }, {
+          "$ref" : "#/parameters/UserOrGroupID"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "TODO",
+            "schema" : {
+              "$ref" : "#/definitions/Collection"
+            }
+          }
+        }
+      }
+    },
+    "/{userOrGroup}/{id}/collections/{collectionKey}" : {
+      "get" : {
+        "description" : "A specific collection in the library",
+        "parameters" : [ {
+          "$ref" : "#/parameters/UserOrGroup"
+        }, {
+          "$ref" : "#/parameters/UserOrGroupID"
+        }, {
+          "$ref" : "#/parameters/CollectionKey"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "TODO",
+            "schema" : {
+              "$ref" : "#/definitions/Collection"
+            }
+          }
+        }
+      }
+    },
+    "/{userOrGroup}/{id}/collections/{collectionKey}/collections" : {
+      "get" : {
+        "description" : "Subcollections within a specific collection in the library",
+        "parameters" : [ {
+          "$ref" : "#/parameters/UserOrGroup"
+        }, {
+          "$ref" : "#/parameters/UserOrGroupID"
+        }, {
+          "$ref" : "#/parameters/CollectionKey"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "TODO",
+            "schema" : {
+              "$ref" : "#/definitions/Collection"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "Collection" : {
+      "type" : "object",
+      "properties" : {
+        "key" : {
+          "type" : "string"
+        },
+        "version" : {
+          "type" : "string"
+        },
+        "library" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "type" : "string",
+              "enum" : [ "user", "group" ]
+            },
+            "id" : {
+              "type" : "integer"
+            },
+            "name" : {
+              "type" : "string"
+            },
+            "links" : {
+              "type" : "object",
+              "properties" : {
+                "alternate" : {
+                  "type" : "object",
+                  "properties" : {
+                    "href" : {
+                      "type" : "string"
+                    },
+                    "type" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters" : {
+    "UserOrGroup" : {
+      "name" : "userOrGroup",
+      "in" : "path",
+      "type" : "string",
+      "enum" : [ "users", "groups" ],
+      "required" : true
+    },
+    "UserOrGroupID" : {
+      "name" : "id",
+      "in" : "path",
+      "type" : "string",
+      "required" : true
+    },
+    "CollectionKey" : {
+      "name" : "collectionKey",
+      "in" : "path",
+      "type" : "string",
+      "required" : true
+    }
+  },
+  "host" : "virtserver.swaggerhub.com",
+  "basePath" : "/retorquere/Zotero/1.0.0"
+}

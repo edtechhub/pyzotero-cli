@@ -162,6 +162,61 @@ paths:
               schema:
                 $ref: '#/components/schemas/Item'
 
+  '/{userOrGroup}/{id}/publications/items':
+    get:
+      description: Items in My Publications  
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Item'
+
+  '/{userOrGroup}/{id}/collections/{key}/items':
+    get:
+      description: Items within a specific collection in the library 
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/Key'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+
+  '/{userOrGroup}/{id}/collections/{key}/items/top':
+    get:
+      description: Top-level items within a specific collection in the library
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/Key'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+
+
 servers:
   - url: 'https://api.zotero.org'
 

@@ -42,13 +42,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/Collection'
                   
-  '/{userOrGroup}/{id}/collections/{collectionKey}':
+  '/{userOrGroup}/{id}/collections/{key}':
     get:
       description: A specific collection in the library
       parameters:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
-        - $ref: '#/components/parameters/CollectionKey'
+        - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
         - $ref: '#/components/parameters/APIKey'
       responses:
@@ -59,13 +59,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Collection'
                   
-  '/{userOrGroup}/{id}/collections/{collectionKey}/collections':
+  '/{userOrGroup}/{id}/collections/{key}/collections':
     get:
       description: Subcollections within a specific collection in the library
       parameters:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
-        - $ref: '#/components/parameters/CollectionKey'
+        - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
         - $ref: '#/components/parameters/APIKey'
       responses:
@@ -128,13 +128,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Item'
                 
-  '/{userOrGroup}/{id}/items/{itemKey}':
+  '/{userOrGroup}/{id}/items/{key}':
     get:
-      description: A specific collection in the library
+      description: A specific item in the library 
       parameters:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
-        - $ref: '#/components/parameters/CollectionKey'
+        - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
         - $ref: '#/components/parameters/APIKey'
       responses:
@@ -143,14 +143,15 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Collection'
-  '/{userOrGroup}/{id}/collections/{collectionKey}/collections':
+                $ref: '#/components/schemas/Item'
+                
+  '/{userOrGroup}/{id}/items/{key}/children':
     get:
-      description: Subcollections within a specific collection in the library
+      description: Child items under a specific item 
       parameters:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
-        - $ref: '#/components/parameters/CollectionKey'
+        - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
         - $ref: '#/components/parameters/APIKey'
       responses:
@@ -159,7 +160,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Collection  
+                $ref: '#/components/schemas/Item'
 
 servers:
   - url: 'https://api.zotero.org'
@@ -204,6 +205,9 @@ components:
       scheme: basic
 
   schemas:
+    Item:
+      type: object
+      
     Collection:
       type: object
       properties:

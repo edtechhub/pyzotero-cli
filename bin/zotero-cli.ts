@@ -75,9 +75,7 @@ class Zotero {
     this.args = this.parser.parseArgs()
 
     // pick up config
-    let config: string = null
-    if (!config && (config = this.args.config || 'zotero-cli.toml') && !fs.existsSync(config)) config = null
-    if (!config && (config = `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`) && !fs.existsSync(config)) config = null
+    const config: string = [ this.args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml` ].find(cfg => fs.existsSync(cfg))
     this.config = config ? TOML(fs.readFileSync(config, 'utf-8')) : {}
 
     // expand selected command

@@ -31,19 +31,19 @@
   },
   "homepage": "https://github.com/edtechhub/zotero-cli#readme",
   "devDependencies": {
-    "@types/node": "^13.1.6",
-    "ts-node": "^8.6.1",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.4"
+    "@types/node": "^13.11.1",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
+    "typescript": "^3.8.3"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.3",
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.0",
     "argparse": "^1.0.10",
     "docstring": "^1.1.0",
     "dotenv": "^8.2.0",
     "http-link-header": "^1.0.2",
-    "request": "^2.88.0",
+    "request": "^2.88.2",
     "request-promise": "^4.2.5"
   },
   "files": [

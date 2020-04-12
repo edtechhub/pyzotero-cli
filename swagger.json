@@ -16,6 +16,8 @@
           "$ref" : "#/components/parameters/UserOrGroup"
         }, {
           "$ref" : "#/components/parameters/UserOrGroupID"
+        }, {
+          "$ref" : "#/components/parameters/APIVersion"
         } ],
         "responses" : {
           "200" : {
@@ -38,6 +40,8 @@
           "$ref" : "#/components/parameters/UserOrGroup"
         }, {
           "$ref" : "#/components/parameters/UserOrGroupID"
+        }, {
+          "$ref" : "#/components/parameters/APIVersion"
         } ],
         "responses" : {
           "200" : {
@@ -62,6 +66,8 @@
           "$ref" : "#/components/parameters/UserOrGroupID"
         }, {
           "$ref" : "#/components/parameters/CollectionKey"
+        }, {
+          "$ref" : "#/components/parameters/APIVersion"
         } ],
         "responses" : {
           "200" : {
@@ -86,6 +92,8 @@
           "$ref" : "#/components/parameters/UserOrGroupID"
         }, {
           "$ref" : "#/components/parameters/CollectionKey"
+        }, {
+          "$ref" : "#/components/parameters/APIVersion"
         } ],
         "responses" : {
           "200" : {
@@ -130,6 +138,14 @@
         "required" : true,
         "schema" : {
           "type" : "string"
+        }
+      },
+      "APIVersion" : {
+        "name" : "Zotero-API-Version",
+        "in" : "header",
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "3" ]
         }
       }
     },

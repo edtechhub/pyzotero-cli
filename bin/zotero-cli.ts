@@ -58,6 +58,7 @@ class Zotero {
     this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
     this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
     this.parser.addArgument('--indent', { type: arg.integer, help: 'Identation for json output.' })
+    this.parser.addArgument('--verbose', { action: 'storeTrue', help: 'Log requests.' })
 
     const subparsers = this.parser.addSubparsers({ title: 'commands', dest: 'command', required: true })
     // add all methods that do not start with _ as a command
@@ -193,8 +194,11 @@ class Zotero {
       return values.map(v => `${param}=${encodeURI(v)}`).join('&')
     }).join('&')
 
+    uri = `${this.base}${prefix}${uri}${params ? '?' + params : ''}`
+    if (this.args.verbose) console.log('GET', uri)
+
     return request({
-      uri: `${this.base}${prefix}${uri}${params ? '?' + params : ''}`,
+      uri,
       headers: this.headers,
       json: options.json,
       resolveWithFullResponse: options.resolveWithFullResponse,
@@ -204,9 +208,12 @@ class Zotero {
   async post(uri, data) {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
+    uri = `${this.base}${prefix}${uri}`
+    if (this.args.verbose) console.log('POST', uri)
+
     return request({
       method: 'POST',
-      uri: `${this.base}${prefix}${uri}`,
+      uri,
       headers: {...this.headers, 'Content-Type': 'application/json'},
       body: data,
     })
@@ -215,9 +222,12 @@ class Zotero {
   async put(uri, data) {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
+    uri = `${this.base}${prefix}${uri}`
+    if (this.args.verbose) console.log('PUT', uri)
+
     return request({
       method: 'PUT',
-      uri: `${this.base}${prefix}${uri}`,
+      uri,
       headers: {...this.headers, 'Content-Type': 'application/json'},
       body: data,
     })
@@ -229,9 +239,12 @@ class Zotero {
     const headers = {...this.headers, 'Content-Type': 'application/json'}
     if (typeof version !== 'undefined') headers['If-Unmodified-Since-Version'] = version
 
+    uri = `${this.base}${prefix}${uri}`
+    if (this.args.verbose) console.log('PATCH', uri)
+
     return request({
       method: 'PATCH',
-      uri: `${this.base}${prefix}${uri}`,
+      uri,
       headers,
       body: data,
     })

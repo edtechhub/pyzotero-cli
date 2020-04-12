@@ -75,15 +75,11 @@ class Zotero {
     this.args = this.parser.parseArgs()
 
     // pick up config
-    const config = this.args.config || 'zotero-cli.toml'
-    if (fs.existsSync(config)) {
-        this.config = TOML(fs.readFileSync(config, 'utf-8'))
-    } else {
-      const configOS = `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`
-      if (fs.existsSync(configOS)) this.config = TOML(fs.readFileSync(configOS, 'utf-8'))
-    } else {
-      this.config = {}
-    }
+    let config: string = null
+    if (!config && (config = this.args.config || 'zotero-cli.toml') && !fs.existsSync(config)) config = null
+    if (!config && (config = `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`) && !fs.existsSync(config)) config = null
+    this.config = config ? TOML(fs.readFileSync(config, 'utf-8')) : {}
+
     // expand selected command
     const options = [].concat.apply([], this.parser._actions.map(action => action.dest === 'command' ? action.choices[this.args.command] : [ action ]))
     for (const option of options) {

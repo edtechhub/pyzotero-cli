@@ -2,7 +2,7 @@
 
 require('dotenv').config()
 require('docstring')
-const os = require('os');
+const os = require('os')
 
 import { ArgumentParser } from 'argparse'
 import { parse as TOML } from '@iarna/toml'
@@ -76,17 +76,14 @@ class Zotero {
 
     // pick up config
     const config = this.args.config || 'zotero-cli.toml'
-    // this.config = fs.existsSync(config) ? TOML(fs.readFileSync(config, 'utf-8')) : {}
     if (fs.existsSync(config)) {
-        this.config = TOML(fs.readFileSync(config, 'utf-8'));
+        this.config = TOML(fs.readFileSync(config, 'utf-8'))
     } else {
-	const configOS = os.homedir() + "/.config/zotero-cli/zotero-cli.toml";
-	if (fs.existsSync(configOS)) {
-            this.config = TOML(fs.readFileSync(configOS, 'utf-8'));
-	} else {
-	    // What now?
-	};
-    };
+      const configOS = `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`
+      if (fs.existsSync(configOS)) this.config = TOML(fs.readFileSync(configOS, 'utf-8'))
+    } else {
+      this.config = {}
+    }
     // expand selected command
     const options = [].concat.apply([], this.parser._actions.map(action => action.dest === 'command' ? action.choices[this.args.command] : [ action ]))
     for (const option of options) {
@@ -535,7 +532,7 @@ class Zotero {
     }
 
     for (const uri of this.args.uri) {
-	this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root }))
+      this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root }))
     }
   }
 }

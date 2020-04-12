@@ -216,6 +216,40 @@ paths:
                 items:
                   $ref: '#/components/schemas/Item'
 
+  '/{userOrGroup}/{id}/searches':
+    get:
+      description: All saved searches in the library 
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Search'
+
+  '/{userOrGroup}/{id}/searches/{key}':
+    get:
+      description: A specific saved search in the library 
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/Key'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Search'
 
 servers:
   - url: 'https://api.zotero.org'
@@ -260,6 +294,9 @@ components:
       scheme: basic
 
   schemas:
+    Search:
+      type: object
+      
     Item:
       type: object
       

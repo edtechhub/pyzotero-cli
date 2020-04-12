@@ -1,6 +1,6 @@
 {
   "name": "zotero-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Command line for interacting with Zotero libraries",
   "main": "bin/zotero-cli.js",
   "preferGlobal": true,

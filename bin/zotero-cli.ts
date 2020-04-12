@@ -2,6 +2,7 @@
 
 require('dotenv').config()
 require('docstring')
+const os = require('os');
 
 import { ArgumentParser } from 'argparse'
 import { parse as TOML } from '@iarna/toml'
@@ -54,7 +55,7 @@ class Zotero {
     // global parameters for all commands
     this.parser = new ArgumentParser
     this.parser.addArgument('--api-key', {help: 'The API key to access the Zotero API.'})
-    this.parser.addArgument('--config', { type: arg.file, help: 'Configuration file (toml format). Note that zotero-cli.toml is picked up automatically.' })
+    this.parser.addArgument('--config', { type: arg.file, help: 'Configuration file (toml format). Note that ./zotero-cli.toml and ~/.config/zotero-cli/zotero-cli.toml is picked up automatically.' })
     this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
     this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
     this.parser.addArgument('--indent', { type: arg.integer, help: 'Identation for json output.' })
@@ -74,8 +75,17 @@ class Zotero {
 
     // pick up config
     const config = this.args.config || 'zotero-cli.toml'
-    this.config = fs.existsSync(config) ? TOML(fs.readFileSync(config, 'utf-8')) : {}
-
+    // this.config = fs.existsSync(config) ? TOML(fs.readFileSync(config, 'utf-8')) : {}
+    if (fs.existsSync(config)) {
+        this.config = TOML(fs.readFileSync(config, 'utf-8'));
+    } else {
+	const configOS = os.homedir() + "/.config/zotero-cli/zotero-cli.toml";
+	if (fs.existsSync(configOS)) {
+            this.config = TOML(fs.readFileSync(configOS, 'utf-8'));
+	} else {
+	    // What now?
+	};
+    };
     // expand selected command
     const options = [].concat.apply([], this.parser._actions.map(action => action.dest === 'command' ? action.choices[this.args.command] : [ action ]))
     for (const option of options) {

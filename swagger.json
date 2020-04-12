@@ -1,15 +1,9 @@
 {
-  "swagger" : "2.0",
+  "openapi" : "3.0.0",
   "info" : {
-    "version" : "1.0.0",
+    "version" : "1.0.1-oas3",
     "title" : "Zotero API",
     "description" : "Zotero API"
-  },
-  "schemes" : [ "https" ],
-  "securityDefinitions" : {
-    "UserSecurity" : {
-      "type" : "basic"
-    }
   },
   "security" : [ {
     "UserSecurity" : [ ]
@@ -19,15 +13,19 @@
       "get" : {
         "description" : "Collections in the library",
         "parameters" : [ {
-          "$ref" : "#/parameters/UserOrGroup"
+          "$ref" : "#/components/parameters/UserOrGroup"
         }, {
-          "$ref" : "#/parameters/UserOrGroupID"
+          "$ref" : "#/components/parameters/UserOrGroupID"
         } ],
         "responses" : {
           "200" : {
             "description" : "Successfully returned a list of collections",
-            "schema" : {
-              "$ref" : "#/definitions/Collection"
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Collection"
+                }
+              }
             }
           }
         }
@@ -37,15 +35,19 @@
       "get" : {
         "description" : "Top-level collections in the library",
         "parameters" : [ {
-          "$ref" : "#/parameters/UserOrGroup"
+          "$ref" : "#/components/parameters/UserOrGroup"
         }, {
-          "$ref" : "#/parameters/UserOrGroupID"
+          "$ref" : "#/components/parameters/UserOrGroupID"
         } ],
         "responses" : {
           "200" : {
             "description" : "TODO",
-            "schema" : {
-              "$ref" : "#/definitions/Collection"
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Collection"
+                }
+              }
             }
           }
         }
@@ -55,17 +57,21 @@
       "get" : {
         "description" : "A specific collection in the library",
         "parameters" : [ {
-          "$ref" : "#/parameters/UserOrGroup"
+          "$ref" : "#/components/parameters/UserOrGroup"
         }, {
-          "$ref" : "#/parameters/UserOrGroupID"
+          "$ref" : "#/components/parameters/UserOrGroupID"
         }, {
-          "$ref" : "#/parameters/CollectionKey"
+          "$ref" : "#/components/parameters/CollectionKey"
         } ],
         "responses" : {
           "200" : {
             "description" : "TODO",
-            "schema" : {
-              "$ref" : "#/definitions/Collection"
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Collection"
+                }
+              }
             }
           }
         }
@@ -75,57 +81,99 @@
       "get" : {
         "description" : "Subcollections within a specific collection in the library",
         "parameters" : [ {
-          "$ref" : "#/parameters/UserOrGroup"
+          "$ref" : "#/components/parameters/UserOrGroup"
         }, {
-          "$ref" : "#/parameters/UserOrGroupID"
+          "$ref" : "#/components/parameters/UserOrGroupID"
         }, {
-          "$ref" : "#/parameters/CollectionKey"
+          "$ref" : "#/components/parameters/CollectionKey"
         } ],
         "responses" : {
           "200" : {
             "description" : "TODO",
-            "schema" : {
-              "$ref" : "#/definitions/Collection"
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Collection"
+                }
+              }
             }
           }
         }
       }
     }
   },
-  "definitions" : {
-    "Collection" : {
-      "type" : "object",
-      "properties" : {
-        "key" : {
+  "servers" : [ {
+    "url" : "https://api.zotero.org"
+  } ],
+  "components" : {
+    "parameters" : {
+      "UserOrGroup" : {
+        "name" : "userOrGroup",
+        "in" : "path",
+        "required" : true,
+        "schema" : {
+          "type" : "string",
+          "enum" : [ "users", "groups" ]
+        }
+      },
+      "UserOrGroupID" : {
+        "name" : "id",
+        "in" : "path",
+        "required" : true,
+        "schema" : {
           "type" : "string"
-        },
-        "version" : {
+        }
+      },
+      "CollectionKey" : {
+        "name" : "collectionKey",
+        "in" : "path",
+        "required" : true,
+        "schema" : {
           "type" : "string"
-        },
-        "library" : {
-          "type" : "object",
-          "properties" : {
-            "type" : {
-              "type" : "string",
-              "enum" : [ "user", "group" ]
-            },
-            "id" : {
-              "type" : "integer"
-            },
-            "name" : {
-              "type" : "string"
-            },
-            "links" : {
-              "type" : "object",
-              "properties" : {
-                "alternate" : {
-                  "type" : "object",
-                  "properties" : {
-                    "href" : {
-                      "type" : "string"
-                    },
-                    "type" : {
-                      "type" : "string"
+        }
+      }
+    },
+    "securitySchemes" : {
+      "UserSecurity" : {
+        "type" : "http",
+        "scheme" : "basic"
+      }
+    },
+    "schemas" : {
+      "Collection" : {
+        "type" : "object",
+        "properties" : {
+          "key" : {
+            "type" : "string"
+          },
+          "version" : {
+            "type" : "string"
+          },
+          "library" : {
+            "type" : "object",
+            "properties" : {
+              "type" : {
+                "type" : "string",
+                "enum" : [ "user", "group" ]
+              },
+              "id" : {
+                "type" : "integer"
+              },
+              "name" : {
+                "type" : "string"
+              },
+              "links" : {
+                "type" : "object",
+                "properties" : {
+                  "alternate" : {
+                    "type" : "object",
+                    "properties" : {
+                      "href" : {
+                        "type" : "string"
+                      },
+                      "type" : {
+                        "type" : "string"
+                      }
                     }
                   }
                 }
@@ -135,28 +183,5 @@
         }
       }
     }
-  },
-  "parameters" : {
-    "UserOrGroup" : {
-      "name" : "userOrGroup",
-      "in" : "path",
-      "type" : "string",
-      "enum" : [ "users", "groups" ],
-      "required" : true
-    },
-    "UserOrGroupID" : {
-      "name" : "id",
-      "in" : "path",
-      "type" : "string",
-      "required" : true
-    },
-    "CollectionKey" : {
-      "name" : "collectionKey",
-      "in" : "path",
-      "type" : "string",
-      "required" : true
-    }
-  },
-  "host" : "virtserver.swaggerhub.com",
-  "basePath" : "/retorquere/Zotero/1.0.0"
+  }
 }

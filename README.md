@@ -17,6 +17,7 @@ npm start -- tags --count
 ### For compiled JS:
 
 ```
+npm i @types/node
 npm run build
 ```
 Then:

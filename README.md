@@ -68,4 +68,24 @@ e.g.
 ```
 zotero-cli collection --help
 ```
-
+### Worked examples.
+Firstly, you need to have your login details ready. Otherwise you need to supply this with each call:
+```
+  --api-key API_KEY
+  --config CONFIG  
+  --user-id USER_ID *or* --group-id GROUP_ID 
+  --indent INDENT 
+```
+Once this is set up, e.g. show your collections
+```
+zotero-cli collections --help
+zotero-cli collections
+```
+Note down a key (K35DEJSM). Show some items
+ ```
+ zotero-cli items --help
+ zotero-cli items --top
+ zotero-cli items --collection K35DEJSM
+ ```
+ 
+ 

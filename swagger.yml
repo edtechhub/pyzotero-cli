@@ -20,7 +20,10 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Collection'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+                  
   '/{userOrGroup}/{id}/collections/top':
     get:
       description: Top-level collections in the library
@@ -35,8 +38,97 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Collection'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+                  
   '/{userOrGroup}/{id}/collections/{collectionKey}':
+    get:
+      description: A specific collection in the library
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/CollectionKey'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Collection'
+                  
+  '/{userOrGroup}/{id}/collections/{collectionKey}/collections':
+    get:
+      description: Subcollections within a specific collection in the library
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/CollectionKey'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+  
+  '/{userOrGroup}/{id}/items':
+    get:
+      description: All items in the library, excluding trashed items 
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: Successfully returned a list of items
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+                  
+  '/{userOrGroup}/{id}/items/top':
+    get:
+      description: Top-level items in the library, excluding trashed items 
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Item'
+                
+  '/{userOrGroup}/{id}/items/trash':
+    get:
+      description: Items in the trash 
+      parameters:
+        - $ref: '#/components/parameters/UserOrGroup'
+        - $ref: '#/components/parameters/UserOrGroupID'
+        - $ref: '#/components/parameters/APIVersion'
+        - $ref: '#/components/parameters/APIKey'
+      responses:
+        '200':
+          description: TODO
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Item'
+                
+  '/{userOrGroup}/{id}/items/{itemKey}':
     get:
       description: A specific collection in the library
       parameters:
@@ -67,7 +159,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Collection'
+                $ref: '#/components/schemas/Collection  
 
 servers:
   - url: 'https://api.zotero.org'
@@ -89,12 +181,11 @@ components:
       required: true
       schema:
         type: string
-    CollectionKey:
-      name: collectionKey
+    Key:
+      name: key
       in: path
       required: true
-      schema:
-        type: string
+      schema: { type: string }
     APIVersion:
       name: Zotero-API-Version
       in: header
@@ -116,29 +207,19 @@ components:
     Collection:
       type: object
       properties:
-        key:
-          type: string
-        version:
-          type: string
+        key: { type: string }
+        version: { type: string }
         library:
           type: object
           properties:
-            type:
-              type: string
-              enum:
-                - user
-                - group
-            id:
-              type: integer
-            name:
-              type: string
+            type: { type: string, enum: ['user', 'group' ] }
+            id: { type: integer }
+            name: { type: string }
             links:
               type: object
               properties:
                 alternate:
                   type: object
                   properties:
-                    href:
-                      type: string
-                    type:
-                      type: string
+                    href: { type: string }
+                    type: { type: string }

@@ -3,8 +3,10 @@ info:
   version: "1.0.1-oas3"
   title: Zotero API
   description: Zotero API
+
 security:
-  - UserSecurity: []
+  - ApiKeyAuth: []
+  
 paths:
   '/{userOrGroup}/{id}/collections':
     get:
@@ -13,7 +15,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: Successfully returned a list of collections
@@ -31,7 +32,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -50,7 +50,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -67,7 +66,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -85,7 +83,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: Successfully returned a list of items
@@ -103,7 +100,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -119,7 +115,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -136,7 +131,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -153,7 +147,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -169,7 +162,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -186,7 +178,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -205,7 +196,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -223,7 +213,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroup'
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -242,7 +231,6 @@ paths:
         - $ref: '#/components/parameters/UserOrGroupID'
         - $ref: '#/components/parameters/Key'
         - $ref: '#/components/parameters/APIVersion'
-        - $ref: '#/components/parameters/APIKey'
       responses:
         '200':
           description: TODO
@@ -255,6 +243,12 @@ servers:
   - url: 'https://api.zotero.org'
 
 components:
+  securitySchemes:
+    ApiKeyAuth:        # arbitrary name for the security scheme
+      type: apiKey
+      in: header       # can be "header", "query" or "cookie"
+      name: Zotero-API-Key  # name of the header, query parameter or cookie
+      
   parameters:
     UserOrGroup:
       name: userOrGroup
@@ -283,15 +277,6 @@ components:
       schema:
         type: string
         enum: ['3']
-    APIKey:
-      name: Zotero-API-Key
-      in: header
-      schema:
-        type: string
-  securitySchemes:
-    UserSecurity:
-      type: http
-      scheme: basic
 
   schemas:
     Search:

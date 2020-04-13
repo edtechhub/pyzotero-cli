@@ -196,7 +196,7 @@ class Zotero {
     }).join('&')
 
     uri = `${this.base}${prefix}${uri}${params ? '?' + params : ''}`
-    if (this.args.verbose) console.log('GET', uri)
+    if (this.args.verbose) console.error('GET', uri)
 
     return request({
       uri,
@@ -210,7 +210,7 @@ class Zotero {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
     uri = `${this.base}${prefix}${uri}`
-    if (this.args.verbose) console.log('POST', uri)
+    if (this.args.verbose) console.error('POST', uri)
 
     return request({
       method: 'POST',
@@ -224,7 +224,7 @@ class Zotero {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
     uri = `${this.base}${prefix}${uri}`
-    if (this.args.verbose) console.log('PUT', uri)
+    if (this.args.verbose) console.error('PUT', uri)
 
     return request({
       method: 'PUT',
@@ -241,7 +241,7 @@ class Zotero {
     if (typeof version !== 'undefined') headers['If-Unmodified-Since-Version'] = version
 
     uri = `${this.base}${prefix}${uri}`
-    if (this.args.verbose) console.log('PATCH', uri)
+    if (this.args.verbose) console.error('PATCH', uri)
 
     return request({
       method: 'PATCH',
@@ -532,6 +532,6 @@ class Zotero {
 }
 
 (new Zotero).run().catch(err => {
-  console.log('error:', err)
+  console.error('error:', err)
   process.exit(1)
 })

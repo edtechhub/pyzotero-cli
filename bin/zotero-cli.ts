@@ -170,27 +170,18 @@ class Zotero {
     if (!this.args.out) {
       console.log.apply(console, args)
     } else {
-      for (const m of args) {
+      this.output += args.map((m, i) => {
         const type = typeof m
-        if (type === 'string' || m instanceof String || type === 'number' || type === 'undefined' || type === 'boolean' || m === null) {
-          this.output += m
 
-        } else if (m instanceof Error) {
-          this.output += `<Error: ${m.message || m.name}${m.stack ? `\n${m.stack}` : ''}>`
+        if (type === 'string' || m instanceof String || type === 'number' || type === 'undefined' || type === 'boolean' || m === null) return m
 
-        } else if (m && type === 'object' && m.message) { // mozilla exception, no idea on the actual instance type
-          // message,fileName,lineNumber,column,stack,errorCode
-          this.output += `<Error: ${m.message}#\n${m.stack}>`
+        if (m instanceof Error) return `<Error: ${m.message || m.name}${m.stack ? `\n${m.stack}` : ''}>`
 
-        } else {
+        if (m && type === 'object' && m.message) return `<Error: ${m.message}#\n${m.stack}>`
 
-          this.output += JSON.stringify(m, null, this.args.indent)
-        }
+        return JSON.stringify(m, null, this.args.indent)
 
-        this.output += ' '
-      }
-
-      if (args.length) this.output[this.output.length - 1] = '\n'
+      }).join(' ') + '\n'
     }
   }
 
@@ -457,10 +448,12 @@ class Zotero {
     if (this.args.count) {
       const params = this.args.filter || {}
 
-      this.print(tags.reduce((acc, tag) => {
-        acc[tag] = await this.count('/items', {...params, tag })
-        return acc
-      }, {}))
+      const tag_counts: Record<string, number> = {}
+      for (const tag of tags) {
+        tag_counts[tag] = await this.count('/items', {...params, tag })
+      }
+      this.print(tag_counts)
+
     } else {
       this.show(tags)
     }

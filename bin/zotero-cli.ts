@@ -42,6 +42,7 @@ const arg = new class {
 
 class Zotero {
   args: any
+  output: string = ''
   parser: any
   config: any
   zotero: any
@@ -52,6 +53,7 @@ class Zotero {
   }
 
   async run() {
+    this.output = ''
     // global parameters for all commands
     this.parser = new ArgumentParser
     this.parser.addArgument('--api-key', {help: 'The API key to access the Zotero API.'})
@@ -59,6 +61,7 @@ class Zotero {
     this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
     this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
     this.parser.addArgument('--indent', { type: arg.integer, help: 'Identation for json output.' })
+    this.parser.addArgument('--out', { type: arg.file, help: 'Output to file' })
     this.parser.addArgument('--verbose', { action: 'storeTrue', help: 'Log requests.' })
 
     const subparsers = this.parser.addSubparsers({ title: 'commands', dest: 'command', required: true })
@@ -159,6 +162,28 @@ class Zotero {
 
     // call the actual command
     await this['$' + this.args.command.replace(/-/g, '_')]()
+
+    if (this.args.out) fs.writeFileSync(this.args.out, this.output)
+  }
+
+  public print(...args: any[]) {
+    if (!this.args.out) {
+      console.log.apply(console, args)
+
+    } else {
+      this.output += args.map(m => {
+        const type = typeof m
+
+        if (type === 'string' || m instanceof String || type === 'number' || type === 'undefined' || type === 'boolean' || m === null) return m
+
+        if (m instanceof Error) return `<Error: ${m.message || m.name}${m.stack ? `\n${m.stack}` : ''}>`
+
+        if (m && type === 'object' && m.message) return `<Error: ${m.message}#\n${m.stack}>`
+
+        return JSON.stringify(m, null, this.args.indent)
+
+      }).join(' ') + '\n'
+    }
   }
 
   async all(uri, params = {}) {
@@ -256,7 +281,7 @@ class Zotero {
   }
 
   show(v) {
-      console.log(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
+      this.print(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
   }
 
   /// THE COMMANDS ///
@@ -338,7 +363,7 @@ class Zotero {
     const collection = this.args.collection ? `/collections/${this.args.collection}` : ''
 
     if (this.args.count) {
-      console.log(await this.count(`${collection}/items${this.args.top ? '/top' : ''}`, this.args.filter || {}))
+      this.print(await this.count(`${collection}/items${this.args.top ? '/top' : ''}`, this.args.filter || {}))
       return
     }
 
@@ -424,9 +449,12 @@ class Zotero {
     if (this.args.count) {
       const params = this.args.filter || {}
 
+      const tag_counts: Record<string, number> = {}
       for (const tag of tags) {
-        console.log(tag, await this.count('/items', {...params, tag }))
+        tag_counts[tag] = await this.count('/items', {...params, tag })
       }
+      this.print(tag_counts)
+
     } else {
       this.show(tags)
     }
@@ -497,7 +525,11 @@ class Zotero {
     if (!this.args.items.length) this.parser.error('Need at least one item to create')
 
     const items = this.args.items.map(item => JSON.parse(fs.readFileSync(item, 'utf-8')))
-    console.log(await this.post('/items', JSON.stringify(items)))
+//<<<<<<< gh-89
+    this.print(await this.post('/items', JSON.stringify(items)))
+//=======
+//    console.log(await this.post('/items', JSON.stringify(items)))
+//>>>>>>> master
   }
 
   async $update_item(argparser = null) {

@@ -496,9 +496,8 @@ class Zotero {
 
     if (!this.args.items.length) this.parser.error('Need at least one item to create')
 
-    for (const item of this.args.items) {
-      console.log(await this.post('/items', fs.readFileSync(item)))
-    }
+    const items = this.args.items.map(item => JSON.parse(fs.readFileSync(item, 'utf-8')))
+    console.log(await this.post('/items', JSON.stringify(items)))
   }
 
   async $update_item(argparser = null) {

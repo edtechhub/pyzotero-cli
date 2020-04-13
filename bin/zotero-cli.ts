@@ -169,8 +169,9 @@ class Zotero {
   public print(...args: any[]) {
     if (!this.args.out) {
       console.log.apply(console, args)
+
     } else {
-      this.output += args.map((m, i) => {
+      this.output += args.map(m => {
         const type = typeof m
 
         if (type === 'string' || m instanceof String || type === 'number' || type === 'undefined' || type === 'boolean' || m === null) return m

@@ -56,7 +56,7 @@ class Zotero {
     this.output = ''
     // global parameters for all commands
     this.parser = new ArgumentParser
-    this.parser.addArgument('--api-key', {help: 'The API key to access the Zotero API.'})
+    this.parser.addArgument('--api-key', { help: 'The API key to access the Zotero API.' })
     this.parser.addArgument('--config', { type: arg.file, help: 'Configuration file (toml format). Note that ./zotero-cli.toml and ~/.config/zotero-cli/zotero-cli.toml is picked up automatically.' })
     this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
     this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
@@ -78,14 +78,14 @@ class Zotero {
     this.args = this.parser.parseArgs()
 
     // pick up config
-    const config: string = [ this.args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml` ].find(cfg => fs.existsSync(cfg))
+    const config: string = [this.args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`].find(cfg => fs.existsSync(cfg))
     this.config = config ? TOML(fs.readFileSync(config, 'utf-8')) : {}
 
     // expand selected command
-    const options = [].concat.apply([], this.parser._actions.map(action => action.dest === 'command' ? action.choices[this.args.command] : [ action ]))
+    const options = [].concat.apply([], this.parser._actions.map(action => action.dest === 'command' ? action.choices[this.args.command] : [action]))
     for (const option of options) {
       if (!option.dest) continue
-      if ([ 'help', 'config' ].includes(option.dest)) continue
+      if (['help', 'config'].includes(option.dest)) continue
 
       if (this.args[option.dest] !== null) continue
 
@@ -128,17 +128,17 @@ class Zotero {
         }
 
       } else if (option.choices) {
-        if (! option.choices.includes(value)) this.parser.error(`${option.dest} must be one of ${option.choices}`)
+        if (!option.choices.includes(value)) this.parser.error(`${option.dest} must be one of ${option.choices}`)
 
       } else if (option.action === 'storeTrue' && typeof value === 'string') {
         const _value = {
-            true: true,
-            yes: true,
-            on: true,
+          true: true,
+          yes: true,
+          on: true,
 
-            false: false,
-            no: false,
-            off: false,
+          false: false,
+          no: false,
+          off: false,
         }[value]
         if (typeof _value === 'undefined') this.parser.error(`%{option.dest} must be boolean, not ${value}`)
         value = _value
@@ -150,10 +150,10 @@ class Zotero {
       this.args[option.dest] = value
     }
 
-    if (! this.args.api_key) this.parser.error('no API key provided')
+    if (!this.args.api_key) this.parser.error('no API key provided')
     this.headers['Zotero-API-Key'] = this.args.api_key
 
-    if (this.args.user_id === null && this.args.group_id === null ) this.parser.error('You must provide exactly one of --user-id or --group-id')
+    if (this.args.user_id === null && this.args.group_id === null) this.parser.error('You must provide exactly one of --user-id or --group-id')
     if (this.args.user_id !== null && this.args.group_id !== null) this.parser.error('You must provide exactly one of --user-id or --group-id')
     if (this.args.user_id === 0) this.args.user_id = (await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false })).userID
 
@@ -216,7 +216,7 @@ class Zotero {
 
     const params = Object.keys(options.params).map(param => {
       let values = options.params[param]
-      if (!Array.isArray(values)) values = [ values ]
+      if (!Array.isArray(values)) values = [values]
       return values.map(v => `${param}=${encodeURI(v)}`).join('&')
     }).join('&')
 
@@ -240,7 +240,7 @@ class Zotero {
     return request({
       method: 'POST',
       uri,
-      headers: {...this.headers, 'Content-Type': 'application/json'},
+      headers: { ...this.headers, 'Content-Type': 'application/json' },
       body: data,
     })
   }
@@ -254,7 +254,7 @@ class Zotero {
     return request({
       method: 'PUT',
       uri,
-      headers: {...this.headers, 'Content-Type': 'application/json'},
+      headers: { ...this.headers, 'Content-Type': 'application/json' },
       body: data,
     })
   }
@@ -262,7 +262,7 @@ class Zotero {
   async patch(uri, data, version?: number) {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
-    const headers = {...this.headers, 'Content-Type': 'application/json'}
+    const headers = { ...this.headers, 'Content-Type': 'application/json' }
     if (typeof version !== 'undefined') headers['If-Unmodified-Since-Version'] = version
 
     uri = `${this.base}${prefix}${uri}`
@@ -281,7 +281,7 @@ class Zotero {
   }
 
   show(v) {
-      this.print(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
+    this.print(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
   }
 
   /// THE COMMANDS ///
@@ -298,10 +298,10 @@ class Zotero {
     /** Retrieve information about a specific collection --key KEY (API: /collection/KEY or /collection/KEY/tags)   */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true,  help: 'The key of the item.' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
       argparser.addArgument('--add', { action: 'storeTrue', help: 'Add items to this collection.' })
-      argparser.addArgument('itemkeys', { nargs: '*'})
+      argparser.addArgument('itemkeys', { nargs: '*' })
       return
     }
 
@@ -349,7 +349,7 @@ class Zotero {
       argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--all', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
-      argparser.addArgument('--collection', {help: 'Retrive list of items for collection'})
+      argparser.addArgument('--collection', { help: 'Retrive list of items for collection' })
       argparser.addArgument('--top', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype' })
       return
@@ -402,7 +402,7 @@ class Zotero {
   async $item(argparser = null) {
     /** Retrieve children for item --key KEY. (API: /items/KEY/ or /items/KEY/children) */
     if (argparser) {
-      argparser.addArgument('--key', { required: true,  help: 'The key of the item.' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
       argparser.addArgument('--children', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
       return
@@ -439,7 +439,7 @@ class Zotero {
     /** Return a list of tags in the library. Options to filter and count tags. (API: /tags) */
 
     if (argparser) {
-      argparser.addArgument('--filter', {help: 'TODO: document'})
+      argparser.addArgument('--filter', { help: 'TODO: document' })
       argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
       return
     }
@@ -451,7 +451,7 @@ class Zotero {
 
       const tag_counts: Record<string, number> = {}
       for (const tag of tags) {
-        tag_counts[tag] = await this.count('/items', {...params, tag })
+        tag_counts[tag] = await this.count('/items', { ...params, tag })
       }
       this.print(tag_counts)
 
@@ -473,8 +473,8 @@ class Zotero {
     /** Retrieve/save attachments for the item specified with --key KEY. (API: /items/KEY/file) */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true,  help: 'The key of the item.'})
-      argparser.addArgument('--save', { required: true, help: 'Filename to save attachment to'})
+      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
+      argparser.addArgument('--save', { required: true, help: 'Filename to save attachment to' })
       return
     }
 
@@ -486,7 +486,7 @@ class Zotero {
 
     if (argparser) return
 
-    this.show(await this.get('/itemTypes', { userOrGroupPrefix: false } ))
+    this.show(await this.get('/itemTypes', { userOrGroupPrefix: false }))
   }
 
   async $fields(argparser = null) {
@@ -496,15 +496,15 @@ class Zotero {
      */
 
     if (argparser) {
-      argparser.addArgument('--type', {help: 'Display fields types for TYPE.'})
+      argparser.addArgument('--type', { help: 'Display fields types for TYPE.' })
       return
     }
 
     if (this.args.type) {
-      this.show(await this.get('/itemTypeFields', { params: { itemType: this.args.type }, userOrGroupPrefix: false } ))
-      this.show(await this.get('/itemTypeCreatorTypes', { params: { itemType: this.args.type }, userOrGroupPrefix: false } ))
+      this.show(await this.get('/itemTypeFields', { params: { itemType: this.args.type }, userOrGroupPrefix: false }))
+      this.show(await this.get('/itemTypeCreatorTypes', { params: { itemType: this.args.type }, userOrGroupPrefix: false }))
     } else {
-      this.show(await this.get('/itemFields', { userOrGroupPrefix: false } ))
+      this.show(await this.get('/itemFields', { userOrGroupPrefix: false }))
     }
   }
 
@@ -512,7 +512,7 @@ class Zotero {
     /** Create a new item or items. (API: /items/new) You can retrieve a template with the --template option.  */
 
     if (argparser) {
-      argparser.addArgument('--template', {help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'."})
+      argparser.addArgument('--template', { help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'." })
       argparser.addArgument('items', { nargs: '*', help: 'Json files for the items to be created.' })
       return
     }
@@ -532,9 +532,9 @@ class Zotero {
     /** Update/replace an item (--key KEY), either update (API: patch /items/KEY) or replacing (using --replace, API: put /items/KEY). */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true,  help: 'The key of the item.' })
-      argparser.addArgument('--replace', { action: 'storeTrue', help: 'TODO: document' })
-      argparser.addArgument('items', { nargs: 1, help: 'TODO: document' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
+      argparser.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item[s] by sumbitting the complete json.' })
+      argparser.addArgument('items', { nargs: 1, help: 'Path of one or more item files in json format.' })
       return
     }
 

@@ -302,6 +302,7 @@ class Zotero {
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
       argparser.addArgument('--add', { action: 'storeTrue', help: 'Add items to this collection.' })
       argparser.addArgument('itemkeys', { nargs: '*' })
+      argparser.addArgument('--remove', { nargs: '*', help: 'Remove items from this collection.' })
       return
     }
 
@@ -326,6 +327,18 @@ class Zotero {
       }
       return
     }
+
+    if (this.args.remove) {
+      for (const itemKey of this.args.remove) {
+        const item = await this.get(`/items/${itemKey}`)
+        const index = item.data.collections.indexOf(this.args.key)
+        if (index > -1) {
+          item.data.collections.splice(index, 1)
+        }
+        await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.data.collections }), item.version)
+      }
+    }
+
     this.show(await this.get(`/collections/${this.args.key}${this.args.tags ? '/tags' : ''}`))
   }
 

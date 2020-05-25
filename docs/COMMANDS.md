@@ -1,6 +1,9 @@
+# Zotero API
+
+Details for 
 https://www.zotero.org/support/dev/web_api/v3/basics
 
-# Collection
+## Collection
 
 | URI | Description | Command |  
 |---|---|---|
@@ -9,7 +12,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 | &lt;prefix>/collections/&lt;collectionKey> | A specific collection in the library | collections --key ABC |
 | &lt;prefix>/collections/&lt;collectionKey>/collections | Subcollections within a specific collection in the library | |
 
-# Items
+## Items
 
 | URI | Description | Command |
 |---|---|---|
@@ -22,7 +25,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 | &lt;prefix>/collections/&lt;collectionKey>/items | Items within a specific collection in the library | items --collection ABC|
 | &lt;prefix>/collections/&lt;collectionKey>/items/top | Top-level items within a specific collection in the library | items  --collection --top |
 
-# Searches
+## Searches
 (Note: Only search metadata is currently available, not search results.)
 
 | URI | Description | Command |
@@ -30,7 +33,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 |&lt;prefix>/searches	| All saved searches in the library | searches |
 |&lt;prefix>/searches/<searchKey>	| A specific saved search in the library | |
 
-# Tags
+## Tags
 | URI | Description | Command |
 |---|---|---|
 | &lt;prefix>/tags | All tags in the library | tags |
@@ -44,7 +47,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 | &lt;prefix>/items/&lt;collectionKey>/items/top/tags | Tags assigned to top-level items in a given collection | |
 | &lt;prefix>/publications/items/tags | Tags assigned to items in My Publications | |
 
-# Other URLs
+## Other URLs
 | URI | Description | Command |
 |---|---|---|
 | /keys/&lt;key> | The user id and privileges of the given API key.Use the DELETE HTTP method to delete the key. This should generally be done only by a client that created the key originally using OAuth. | key |

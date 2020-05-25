@@ -40,6 +40,10 @@ zotero-cli collections --key K35DEJSM
 
 TODO
 
+## Adding sub-collections
+
+TODO
+
 # Items
 ## Getting item information
 
@@ -99,7 +103,7 @@ For further options, see `zotero-cli create-item --h`.
 
 # Attachments
 
-# Getting attachments
+## Getting attachments
 ```
 zotero-cli.ts attachment [-h] --key KEY --save SAVE
 ```

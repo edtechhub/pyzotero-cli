@@ -347,10 +347,17 @@ class Zotero {
 
     if (argparser) {
       argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
+      argparser.addArgument('--key', { help: 'Show all the child collections of the key.' })
       return
     }
 
-    this.show(await this.get(`/collections${this.args.top ? '/top' : ''}`))
+    let collections = await this.get(`/collections${this.args.top ? '/top' : ''}`)
+
+    if (this.args.key) {
+      collections = collections.filter(c => c.data.parentCollection === this.args.key)
+    }
+
+    this.show(collections)
   }
 
   async $items(argparser = null) {

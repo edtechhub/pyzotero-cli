@@ -1,5 +1,6 @@
 # Worked examples
 
+## Getting started 
 Firstly, you need to have your login details ready. Otherwise you need to supply this with each call:
 
 ```
@@ -9,20 +10,40 @@ Firstly, you need to have your login details ready. Otherwise you need to supply
   --indent INDENT
 ```
 
-Once this is set up, e.g. show your collections
+Remember that you can store this in `zotero-cli.toml` too.
+
+## What groups do I have access to?
+
+If you want to access a group collection but don't know the GROUP_ID, find it like this:
+
+```
+zotero-cli groups
+```
+
+# Collections
+## Display collections
+
+Once the login details are set up, and you have the GROUP_ID, e.g. show your collections
 
 ```
 zotero-cli collections --help
 zotero-cli collections
 ```
 
-Show sub-collections of a collection
+Note down a key (K35DEJSM). Show sub-collections of that collection
 
 ```
 zotero-cli collections --key K35DEJSM
 ```
 
-Note down a key (K35DEJSM). Show some items
+## Adding and removing items to/from a collection
+
+TODO
+
+# Items
+## Getting item information
+
+Use the same key (K35DEJSM). Show some items
 
 ```
 zotero-cli items --help
@@ -30,13 +51,19 @@ zotero-cli items --top
 zotero-cli items --collection K35DEJSM
 ```
 
-Show the groups user is part of
+## Item types and item fields (with localised names) 
 
 ```
-zotero-cli groups
+zotero-cli types
+zotero-cli fields --type=book
 ```
 
-Update an existing item:
+## Updating the collections for an item
+
+TODO
+
+## Update an existing item:
+
 Properties not included in the uploaded JSON are left untouched on the server.
 
 ```
@@ -55,14 +82,8 @@ With --replace, you submit the item's complete editable JSON to the server, typi
 zotero-cli update-item --key ITEM_KEY NEW.json
 ```
 
-# Item types and item fields (with localised names) 
 
-```
-zotero-cli types
-zotero-cli fields --type=book
-```
-
-# Item creation
+## Item creation
 Here is how you use create-item:
 ```
 zotero-cli create-item --template book > book.json
@@ -75,6 +96,8 @@ For further options, see `zotero-cli create-item --h`.
 ```
 zotero-cli get /apipath
 ```
+
+## Attachments
 
 # Getting attachments
 ```

@@ -418,11 +418,35 @@ class Zotero {
       argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
       argparser.addArgument('--children', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
+      argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections' })
+      argparser.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections' })
       return
     }
 
-    const params = this.args.filter || {}
+    const item = await this.get(`/items/${this.args.key}`)
 
+    if (this.args.addtocollection) {
+      let newCollections = item.data.collections
+      this.args.addtocollection.forEach(itemKey => {
+        if (!newCollections.includes(itemKey)) {
+          newCollections.push(itemKey)
+        }
+      })
+      await this.patch(`/items/${this.args.key}`, JSON.stringify({ collections: newCollections }), item.version)
+    }
+
+    if (this.args.removefromcollection) {
+      let newCollections = item.data.collections
+      this.args.removefromcollection.forEach(itemKey => {
+        const index = newCollections.indexOf(itemKey)
+        if (index > -1) {
+          newCollections.splice(index, 1)
+        }
+      })
+      await this.patch(`/items/${this.args.key}`, JSON.stringify({ collections: newCollections }), item.version)
+    }
+
+    const params = this.args.filter || {}
     if (this.args.children) {
       this.show(await this.get(`/items/${this.args.key}/children`, { params }))
     } else {

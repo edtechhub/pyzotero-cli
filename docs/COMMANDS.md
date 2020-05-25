@@ -50,28 +50,3 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 | /keys/&lt;key> | The user id and privileges of the given API key.Use the DELETE HTTP method to delete the key. This should generally be done only by a client that created the key originally using OAuth. | key |
 | /users/&lt;userID>/groups | The set of groups the current API key has access to, including public groups the key owner belongs to even if the key doesn't have explicit permissions for them. | |
 
-# Item types and item fields (with localised names) 
-
-```
-zotero-cli types
-zotero-cli fields --type=book
-```
-
-# Item creation
-Here is how you use create-item:
-```
-zotero-cli create-item --template book > book.json
-gedit book.json
-zotero-cli create-item book.json
-```
-For further options, see `zotero-cli create-item --h`.
-
-# Generic get request
-```
-zotero-cli get /apipath
-```
-
-# Getting attachments
-```
-zotero-cli.ts attachment [-h] --key KEY --save SAVE
-```

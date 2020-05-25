@@ -1,6 +1,7 @@
 # zotero-cli
 
-## node
+## Installation
+### node
 
 Run the following command to install dependencies
 
@@ -20,7 +21,7 @@ E.g.
 npm start -- tags --count
 ```
 
-### For compiled JS:
+#### For compiled JS:
 
 ```
 npm i @types/node
@@ -39,7 +40,7 @@ E.g.
 ./bin/zotero-cli.js tags --count
 ```
 
-## Documentation
+## Documentation - overview
 
 ### Configuration
 

@@ -533,6 +533,13 @@ class Zotero {
     this.show(await this.get('/itemTypes', { userOrGroupPrefix: false }))
   }
 
+  async $groups(argparser = null) {
+    /** Retrieve the Zotero groups data to which the current library_id and api_key has access to. (API: /users/<user-id>/groups) */
+    if (argparser) return
+
+    this.show(await this.get('/groups'))
+  }
+
   async $fields(argparser = null) {
     /**
      * Retrieve a template with the fields for --type TYPE (API: /itemTypeFields, /itemTypeCreatorTypes) or all item fields (API: /itemFields).

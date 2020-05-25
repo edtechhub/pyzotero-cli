@@ -62,6 +62,7 @@ zotero-cli fields --type=book
 
 TODO
 
+
 ## Update an existing item:
 
 Properties not included in the uploaded JSON are left untouched on the server.
@@ -84,7 +85,9 @@ zotero-cli update-item --key ITEM_KEY NEW.json
 
 
 ## Item creation
+
 Here is how you use create-item:
+
 ```
 zotero-cli create-item --template book > book.json
 gedit book.json
@@ -92,14 +95,18 @@ zotero-cli create-item book.json
 ```
 For further options, see `zotero-cli create-item --h`.
 
-# Generic get request
-```
-zotero-cli get /apipath
-```
 
-## Attachments
+
+# Attachments
 
 # Getting attachments
 ```
 zotero-cli.ts attachment [-h] --key KEY --save SAVE
+```
+
+
+
+# Generic get request
+```
+zotero-cli get /apipath
 ```

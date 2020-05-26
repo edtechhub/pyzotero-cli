@@ -120,7 +120,7 @@ zotero-cli.ts searches
 ## Create new saved search(s)
 
 ```
-zotero-cli.ts create-searches search.json
+zotero-cli.ts searches --create search.json
 ```
 
 # Generic get request

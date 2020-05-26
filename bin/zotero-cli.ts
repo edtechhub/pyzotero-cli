@@ -505,34 +505,32 @@ class Zotero {
   }
 
   async $searches(argparser = null) {
-    /** Return a list of the saved searches of the library. (API: /searches) */
-
-    if (argparser) return
-
-    const items = await this.get('/searches')
-    this.show(items)
-  }
-
-  async $create_searches(argparser = null) {
-    /** Create saved searches specified in a json file. (API: POST /searches) */
+    /** Return/Create a list of the saved searches of the library. (API: /searches) */
 
     if (argparser) {
-      argparser.addArgument('searchFile', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
+      argparser.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
       return
     }
 
-    let searchDef = [];
-    try {
-      searchDef = JSON.parse(fs.readFileSync(this.args.searchFile[0], 'utf8'))
-    } catch (ex) {
-      console.log('Invalid search definition: ', ex)
+    if (this.args.create) {
+      let searchDef = [];
+      try {
+        searchDef = JSON.parse(fs.readFileSync(this.args.create[0], 'utf8'))
+      } catch (ex) {
+        console.log('Invalid search definition: ', ex)
+      }
+
+      if (!Array.isArray(searchDef)) {
+        searchDef = [searchDef]
+      }
+
+      await this.post('/searches', JSON.stringify(searchDef))
+      this.print('Saved search(s) created successfully.')
+      return
     }
 
-    if (!Array.isArray(searchDef)) {
-      searchDef = [searchDef]
-    }
-
-    await this.post('/searches', JSON.stringify(searchDef))
+    const items = await this.get('/searches')
+    this.show(items)
   }
 
   async $attachment(argparser = null) {

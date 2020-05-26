@@ -71,7 +71,11 @@ zotero-cli fields --type=book
 
 ## Updating the collections for an item
 
-TODO
+Add or remove item from several collections
+
+```
+zotero-cli item --key ABC --addtocollection=DEF --removefromcollection=GHI,JKL
+```
 
 ## Update an existing item:
 
@@ -79,12 +83,6 @@ Properties not included in the uploaded JSON are left untouched on the server.
 
 ```
 zotero-cli update-item --key ITEM_KEY UPDATE.json
-```
-
-Add or remove item from several collections
-
-```
-zotero-cli item --key ABC --addtocollection=DEF --removefromcollection=GHI,JKL
 ```
 
 With --replace, you submit the item's complete editable JSON to the server, typically by modifying the downloaded editable JSON — that is, the contents of the data property — directly and resubmitting it.
@@ -123,7 +121,11 @@ zotero-cli.ts searches
 
 ## Create new saved search(s)
 
+Get the json for existing searches, edit, and create.
+
 ```
+zotero-cli.ts searches > search.json
+gedit search.json
 zotero-cli.ts searches --create search.json
 ```
 

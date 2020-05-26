@@ -1,0 +1,17 @@
+[
+  {
+    "name": "My Search",
+    "conditions": [
+      {
+        "condition": "title",
+        "operator": "contains",
+        "value": "foo"
+      },
+      {
+        "condition": "date",
+        "operator": "isInTheLast",
+        "value": "7 days"
+      }
+    ]
+  }
+]

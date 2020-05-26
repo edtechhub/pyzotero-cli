@@ -113,6 +113,20 @@ For further options, see `zotero-cli create-item --h`.
 zotero-cli.ts attachment [-h] --key KEY --save SAVE
 ```
 
+# Searches
+
+## Get searches
+
+```
+zotero-cli.ts searches
+```
+
+## Create new saved search(s)
+
+```
+zotero-cli.ts searches --create search.json
+```
+
 # Generic get request
 
 ```

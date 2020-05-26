@@ -1,6 +1,7 @@
 # Worked examples
 
-## Getting started 
+## Getting started
+
 Firstly, you need to have your login details ready. Otherwise you need to supply this with each call:
 
 ```
@@ -21,6 +22,7 @@ zotero-cli groups
 ```
 
 # Collections
+
 ## Display collections
 
 Once the login details are set up, and you have the GROUP_ID, e.g. show your collections
@@ -42,9 +44,14 @@ TODO
 
 ## Adding sub-collections
 
-TODO
+zotero-cli collections --key K35DEJSM --create-child "Child subcollection1" "Child subcollection 2"
+
+## Adding collections at the top level
+
+zotero-cli collections --create-child "Child subcollection1" "Child subcollection 2"
 
 # Items
+
 ## Getting item information
 
 Use the same key (K35DEJSM). Show some items
@@ -55,7 +62,7 @@ zotero-cli items --top
 zotero-cli items --collection K35DEJSM
 ```
 
-## Item types and item fields (with localised names) 
+## Item types and item fields (with localised names)
 
 ```
 zotero-cli types
@@ -65,7 +72,6 @@ zotero-cli fields --type=book
 ## Updating the collections for an item
 
 TODO
-
 
 ## Update an existing item:
 
@@ -87,7 +93,6 @@ With --replace, you submit the item's complete editable JSON to the server, typi
 zotero-cli update-item --key ITEM_KEY NEW.json
 ```
 
-
 ## Item creation
 
 Here is how you use create-item:
@@ -97,20 +102,19 @@ zotero-cli create-item --template book > book.json
 gedit book.json
 zotero-cli create-item book.json
 ```
+
 For further options, see `zotero-cli create-item --h`.
-
-
 
 # Attachments
 
 ## Getting attachments
+
 ```
 zotero-cli.ts attachment [-h] --key KEY --save SAVE
 ```
 
-
-
 # Generic get request
+
 ```
 zotero-cli get /apipath
 ```

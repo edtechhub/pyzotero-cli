@@ -337,17 +337,26 @@ class Zotero {
         }
         await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.data.collections }), item.version)
       }
+      return;
     }
 
     this.show(await this.get(`/collections/${this.args.key}${this.args.tags ? '/tags' : ''}`))
   }
 
   async $collections(argparser = null) {
-    /** Retrieve a list of collections. (API: /collections or /collection/top) */
+    /** Retrieve a list of collections or create a collection. (API: /collections or /collection/top) */
 
     if (argparser) {
       argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
       argparser.addArgument('--key', { help: 'Show all the child collections of the key.' })
+      argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
+      return
+    }
+
+    if (this.args.create_child) {
+      const response = await this.post('/collections',
+        JSON.stringify(this.args.create_child.map(c => { return { name: c, parentCollection: this.args.key } })))
+      this.print('Collections created: ', JSON.parse(response).successful)
       return
     }
 
@@ -505,9 +514,29 @@ class Zotero {
   }
 
   async $searches(argparser = null) {
-    /** Return a list of the saved searches of the library. (API: /searches) */
+    /** Return/Create a list of the saved searches of the library. (API: /searches) */
 
-    if (argparser) return
+    if (argparser) {
+      argparser.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
+      return
+    }
+
+    if (this.args.create) {
+      let searchDef = [];
+      try {
+        searchDef = JSON.parse(fs.readFileSync(this.args.create[0], 'utf8'))
+      } catch (ex) {
+        console.log('Invalid search definition: ', ex)
+      }
+
+      if (!Array.isArray(searchDef)) {
+        searchDef = [searchDef]
+      }
+
+      await this.post('/searches', JSON.stringify(searchDef))
+      this.print('Saved search(s) created successfully.')
+      return
+    }
 
     const items = await this.get('/searches')
     this.show(items)

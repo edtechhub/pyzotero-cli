@@ -337,17 +337,26 @@ class Zotero {
         }
         await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.data.collections }), item.version)
       }
+      return;
     }
 
     this.show(await this.get(`/collections/${this.args.key}${this.args.tags ? '/tags' : ''}`))
   }
 
   async $collections(argparser = null) {
-    /** Retrieve a list of collections. (API: /collections or /collection/top) */
+    /** Retrieve a list of collections or create a collection. (API: /collections or /collection/top) */
 
     if (argparser) {
       argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
       argparser.addArgument('--key', { help: 'Show all the child collections of the key.' })
+      argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
+      return
+    }
+
+    if (this.args.create_child) {
+      const response = await this.post('/collections',
+        JSON.stringify(this.args.create_child.map(c => { return { name: c, parentCollection: this.args.key } })))
+      this.print('Collections created: ', JSON.parse(response).successful)
       return
     }
 

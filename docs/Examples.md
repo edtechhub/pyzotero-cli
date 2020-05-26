@@ -44,7 +44,11 @@ TODO
 
 ## Adding sub-collections
 
-TODO
+zotero-cli collections --key K35DEJSM --create-child "Child subcollection1" "Child subcollection 2"
+
+## Adding collections at the top level
+
+zotero-cli collections --create-child "Child subcollection1" "Child subcollection 2"
 
 # Items
 

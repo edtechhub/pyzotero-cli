@@ -18,7 +18,7 @@ Remember that you can store this in `zotero-cli.toml` too.
 If you want to access a group collection but don't know the GROUP_ID, find it like this:
 
 ```
-zotero-cli groups
+zotero-cli.js groups
 ```
 
 # Collections
@@ -28,27 +28,33 @@ zotero-cli groups
 Once the login details are set up, and you have the GROUP_ID, e.g. show your collections
 
 ```
-zotero-cli collections --help
-zotero-cli collections
+zotero-cli.js collections --help
+zotero-cli.js collections
 ```
 
 Note down a key (K35DEJSM). Show sub-collections of that collection
 
 ```
-zotero-cli collections --key K35DEJSM
+zotero-cli.js collections --key K35DEJSM
 ```
 
 ## Adding and removing items to/from a collection
 
-TODO
+```
+zotero-cli.js collection --key K35DEJSM --add ITEM_KEY1 ITEM_KEY2 --remove ITEM_KEY3 ITEM_KEY4
+```
 
 ## Adding sub-collections
 
-zotero-cli collections --key K35DEJSM --create-child "Child subcollection1" "Child subcollection 2"
+```
+zotero-cli.js collections --key K35DEJSM --create-child "Child subcollection1" "Child subcollection 2"
+```
 
 ## Adding collections at the top level
 
-zotero-cli collections --create-child "Child subcollection1" "Child subcollection 2"
+```
+zotero-cli.js collections --create-child "Child subcollection1" "Child subcollection 2"
+```
 
 # Items
 
@@ -57,16 +63,16 @@ zotero-cli collections --create-child "Child subcollection1" "Child subcollectio
 Use the same key (K35DEJSM). Show some items
 
 ```
-zotero-cli items --help
-zotero-cli items --top
-zotero-cli items --collection K35DEJSM
+zotero-cli.js items --help
+zotero-cli.js items --top
+zotero-cli.js items --collection K35DEJSM
 ```
 
 ## Item types and item fields (with localised names)
 
 ```
-zotero-cli types
-zotero-cli fields --type=book
+zotero-cli.js types
+zotero-cli.js fields --type=book
 ```
 
 ## Updating the collections for an item
@@ -74,7 +80,7 @@ zotero-cli fields --type=book
 Add or remove item from several collections
 
 ```
-zotero-cli item --key ABC --addtocollection=DEF --removefromcollection=GHI,JKL
+zotero-cli.js item --key ABC --addtocollection=DEF --removefromcollection=GHI,JKL
 ```
 
 ## Update an existing item:
@@ -82,13 +88,13 @@ zotero-cli item --key ABC --addtocollection=DEF --removefromcollection=GHI,JKL
 Properties not included in the uploaded JSON are left untouched on the server.
 
 ```
-zotero-cli update-item --key ITEM_KEY UPDATE.json
+zotero-cli.js update-item --key ITEM_KEY UPDATE.json
 ```
 
 With --replace, you submit the item's complete editable JSON to the server, typically by modifying the downloaded editable JSON — that is, the contents of the data property — directly and resubmitting it.
 
 ```
-zotero-cli update-item --key ITEM_KEY NEW.json
+zotero-cli.js update-item --key ITEM_KEY NEW.json
 ```
 
 ## Item creation
@@ -96,19 +102,19 @@ zotero-cli update-item --key ITEM_KEY NEW.json
 Here is how you use create-item:
 
 ```
-zotero-cli create-item --template book > book.json
+zotero-cli.js create-item --template book > book.json
 gedit book.json
-zotero-cli create-item book.json
+zotero-cli.js create-item book.json
 ```
 
-For further options, see `zotero-cli create-item --h`.
+For further options, see `zotero-cli.js create-item --h`.
 
 # Attachments
 
 ## Getting attachments
 
 ```
-zotero-cli.ts attachment [-h] --key KEY --save SAVE
+zotero-cli.js attachment [-h] --key KEY --save SAVE
 ```
 
 # Searches
@@ -116,7 +122,7 @@ zotero-cli.ts attachment [-h] --key KEY --save SAVE
 ## Get searches
 
 ```
-zotero-cli.ts searches
+zotero-cli.js searches
 ```
 
 ## Create new saved search(s)
@@ -124,13 +130,13 @@ zotero-cli.ts searches
 Get the json for existing searches, edit, and create.
 
 ```
-zotero-cli.ts searches > search.json
+zotero-cli.js searches > search.json
 gedit search.json
-zotero-cli.ts searches --create search.json
+zotero-cli.js searches --create search.json
 ```
 
 # Generic get request
 
 ```
-zotero-cli get /apipath
+zotero-cli.js get /apipath
 ```

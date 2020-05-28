@@ -325,7 +325,6 @@ class Zotero {
         if (item.data.collections.includes(this.args.key)) continue
         await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.data.collections.concat(this.args.key) }), item.version)
       }
-      return
     }
 
     if (this.args.remove) {
@@ -337,7 +336,6 @@ class Zotero {
         }
         await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.data.collections }), item.version)
       }
-      return;
     }
 
     this.show(await this.get(`/collections/${this.args.key}${this.args.tags ? '/tags' : ''}`))

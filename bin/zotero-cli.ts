@@ -490,19 +490,23 @@ class Zotero {
     /** Return a list of tags in the library. Options to filter and count tags. (API: /tags) */
 
     if (argparser) {
-      argparser.addArgument('--filter', { help: 'TODO: document' })
+      argparser.addArgument('--filter', { help: 'Tags of all types matching a specific name.' })
       argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
       return
     }
 
-    const tags = (await this.all('/tags')).map(tag => tag.tag).sort()
+    let rawTags = null;
+    if (this.args.filter) {
+      rawTags = await this.all(`/tags/${encodeURIComponent(this.args.filter)}`)
+    } else {
+      rawTags = await this.all('/tags')
+    }
+    const tags = rawTags.map(tag => tag.tag).sort()
 
     if (this.args.count) {
-      const params = this.args.filter || {}
-
       const tag_counts: Record<string, number> = {}
       for (const tag of tags) {
-        tag_counts[tag] = await this.count('/items', { ...params, tag })
+        tag_counts[tag] = await this.count('/items', { tag })
       }
       this.print(tag_counts)
 

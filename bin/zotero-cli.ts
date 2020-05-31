@@ -161,7 +161,12 @@ class Zotero {
     if (this.args.indent === null) this.args.indent = 2
 
     // call the actual command
-    await this['$' + this.args.command.replace(/-/g, '_')]()
+    try {
+      await this['$' + this.args.command.replace(/-/g, '_')]()
+    } catch (ex) {
+      this.print('Command execution failed: ', ex)
+      process.exit(1)
+    }
 
     if (this.args.out) fs.writeFileSync(this.args.out, this.output)
   }

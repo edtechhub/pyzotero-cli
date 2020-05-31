@@ -1,6 +1,6 @@
 # zotero-cli
 
-A commandline tool to interact with the Zotero API. Developed by https://github.com/bjohas, https://github.com/retorquere and https://github.com/a1diablo.
+A commandline tool to interact with the Zotero API. Developed by [@bjohas](https://github.com/bjohas), (@retorquere)[https://github.com/retorquere] and (@a1diablo)[https://github.com/a1diablo].
 
 ## Installation
 ### node

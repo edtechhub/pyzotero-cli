@@ -358,10 +358,11 @@ class Zotero {
       return
     }
 
-    let collections = await this.get(`/collections${this.args.top ? '/top' : ''}`)
-
+    let collections = null;
     if (this.args.key) {
-      collections = collections.filter(c => c.data.parentCollection === this.args.key)
+      collections = await this.get(`/collections/${this.args.key}/collections`)
+    } else {
+      collections = await this.get(`/collections${this.args.top ? '/top' : ''}`)
     }
 
     this.show(collections)

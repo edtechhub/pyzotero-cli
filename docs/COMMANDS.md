@@ -5,7 +5,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 
 ## Collection
 
-| URI | Description | Command |  
+| URI | Description | zotero-cli |  
 |---|---|---|
 | &lt;prefix>/collections | Collections in the library | collections |
 | &lt;prefix>/collections/top | Top-level collections in the library | collections --top |
@@ -14,7 +14,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 
 ## Items
 
-| URI | Description | Command |
+| URI | Description | zotero-cli |
 |---|---|---|
 | &lt;prefix>/items | All items in the library, excluding trashed items | items |
 | &lt;prefix>/items/top | Top-level items in the library, excluding trashed items | items --top |
@@ -28,13 +28,13 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 ## Searches
 (Note: Only search metadata is currently available, not search results.)
 
-| URI | Description | Command |
+| URI | Description | zotero-cli |
 |---|---|---|
 |&lt;prefix>/searches	| All saved searches in the library | searches |
 |&lt;prefix>/searches/<searchKey>	| A specific saved search in the library | |
 
 ## Tags
-| URI | Description | Command |
+| URI | Description | zotero-cli |
 |---|---|---|
 | &lt;prefix>/tags | All tags in the library | tags |
 | &lt;prefix>/tags/&lt;url+encoded+tag> | Tags of all types matching a specific name | |
@@ -48,7 +48,7 @@ https://www.zotero.org/support/dev/web_api/v3/basics
 | &lt;prefix>/publications/items/tags | Tags assigned to items in My Publications | |
 
 ## Other URLs
-| URI | Description | Command |
+| URI | Description | zotero-cli |
 |---|---|---|
 | /keys/&lt;key> | The user id and privileges of the given API key.Use the DELETE HTTP method to delete the key. This should generally be done only by a client that created the key originally using OAuth. | key |
 | /users/&lt;userID>/groups | The set of groups the current API key has access to, including public groups the key owner belongs to even if the key doesn't have explicit permissions for them. | |

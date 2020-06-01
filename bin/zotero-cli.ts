@@ -626,8 +626,9 @@ class Zotero {
       return
     }
 
+    const originalItem = await this.get(`/items/${this.args.key}`)
     for (const item of this.args.items) {
-      await this[this.args.replace ? 'put' : 'patch'](`/items/${this.args.key}`, fs.readFileSync(item))
+      await this[this.args.replace ? 'put' : 'patch'](`/items/${this.args.key}`, fs.readFileSync(item), originalItem.version)
     }
   }
 

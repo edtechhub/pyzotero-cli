@@ -211,13 +211,13 @@ class Zotero {
     return data
   }
 
-  async get(uri, options: { userOrGroupPrefix?: boolean, params?: any, resolveWithFullResponse?: boolean, json?: boolean } = {}, pathPrefix = null) {
+  async get(uri, options: { userOrGroupPrefix?: boolean, params?: any, resolveWithFullResponse?: boolean, json?: boolean } = {}) {
     if (typeof options.userOrGroupPrefix === 'undefined') options.userOrGroupPrefix = true
     if (typeof options.params === 'undefined') options.params = {}
     if (typeof options.json === 'undefined') options.json = true
 
     let prefix = ''
-    if (options.userOrGroupPrefix) prefix = pathPrefix || (this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`)
+    if (options.userOrGroupPrefix) prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
     const params = Object.keys(options.params).map(param => {
       let values = options.params[param]
@@ -236,8 +236,8 @@ class Zotero {
     })
   }
 
-  async post(uri, data, pathPrefix = null) {
-    const prefix = pathPrefix || (this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`)
+  async post(uri, data) {
+    const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
     uri = `${this.base}${prefix}${uri}`
     if (this.args.verbose) console.error('POST', uri)
@@ -250,8 +250,8 @@ class Zotero {
     })
   }
 
-  async put(uri, data, prefixPath = null) {
-    const prefix = prefixPath || (this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`)
+  async put(uri, data) {
+    const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
     uri = `${this.base}${prefix}${uri}`
     if (this.args.verbose) console.error('PUT', uri)
@@ -264,8 +264,8 @@ class Zotero {
     })
   }
 
-  async patch(uri, data, version?: number, prefixPath = null) {
-    const prefix = prefixPath || (this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`)
+  async patch(uri, data, version?: number) {
+    const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
     const headers = { ...this.headers, 'Content-Type': 'application/json' }
     if (typeof version !== 'undefined') headers['If-Unmodified-Since-Version'] = version
@@ -602,7 +602,6 @@ class Zotero {
     if (argparser) {
       argparser.addArgument('--template', { help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'." })
       argparser.addArgument('items', { nargs: '*', help: 'Json files for the items to be created.' })
-      argparser.addArgument('--group', { help: "Group id for which the item needs to be created." })
       return
     }
 
@@ -614,7 +613,7 @@ class Zotero {
     if (!this.args.items.length) this.parser.error('Need at least one item to create')
 
     const items = this.args.items.map(item => JSON.parse(fs.readFileSync(item, 'utf-8')))
-    this.print(await this.post('/items', JSON.stringify(items), this.args.group ? `/groups/${this.args.group}` : null))
+    this.print(await this.post('/items', JSON.stringify(items)))
   }
 
   async $update_item(argparser = null) {
@@ -624,14 +623,12 @@ class Zotero {
       argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
       argparser.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item[s] by sumbitting the complete json.' })
       argparser.addArgument('items', { nargs: 1, help: 'Path of one or more item files in json format.' })
-      argparser.addArgument('--group', { help: "Group id for which the item needs to be updated." })
       return
     }
 
-    const originalItem = await this.get(`/items/${this.args.key}`, {}, this.args.group ? `/groups/${this.args.group}` : null)
+    const originalItem = await this.get(`/items/${this.args.key}`)
     for (const item of this.args.items) {
-      await this[this.args.replace ? 'put' : 'patch'](`/items/${this.args.key}`,
-        fs.readFileSync(item), originalItem.version, this.args.group ? `/groups/${this.args.group}` : null)
+      await this[this.args.replace ? 'put' : 'patch'](`/items/${this.args.key}`, fs.readFileSync(item), originalItem.version)
     }
   }
 

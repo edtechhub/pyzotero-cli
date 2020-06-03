@@ -81,6 +81,18 @@ class Zotero {
     const config: string = [this.args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`].find(cfg => fs.existsSync(cfg))
     this.config = config ? TOML(fs.readFileSync(config, 'utf-8')) : {}
 
+    if (this.args.user_id || this.args.group_id) {
+      //Overwriting command line option in config
+      delete this.config['user-id']
+      delete this.config['group-id']
+
+      this.config['user-id'] = this.args.user_id
+      this.config['group-id'] = this.args.group_id
+
+      if (!this.config['user-id']) delete this.config['user-id']
+      if (!this.config['group-id']) delete this.config['group-id']
+    }
+
     // expand selected command
     const options = [].concat.apply([], this.parser._actions.map(action => action.dest === 'command' ? action.choices[this.args.command] : [action]))
     for (const option of options) {

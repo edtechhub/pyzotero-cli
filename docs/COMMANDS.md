@@ -3,7 +3,7 @@
 Details for 
 https://www.zotero.org/support/dev/web_api/v3/basics
 
-`&lt;prefix>` below means `/users/&lt;userID>` or `/groups/&lt;groupID>`.
+`<prefix>` below means `/users/<userID>` or `/groups/<groupID>`.
 
 ## Collection
 

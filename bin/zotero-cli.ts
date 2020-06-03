@@ -440,11 +440,10 @@ class Zotero {
       argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
       argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections' })
       argparser.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections' })
-      argparser.addArgument('--group', { help: "Group id for the item being retrieved." })
       return
     }
 
-    const item = await this.get(`/items/${this.args.key}`, {}, this.args.group ? `/groups/${this.args.group}` : null)
+    const item = await this.get(`/items/${this.args.key}`)
 
     if (this.args.addtocollection) {
       let newCollections = item.data.collections
@@ -453,7 +452,7 @@ class Zotero {
           newCollections.push(itemKey)
         }
       })
-      await this.patch(`/items/${this.args.key}`, JSON.stringify({ collections: newCollections }), item.version, this.args.group ? `/groups/${this.args.group}` : null)
+      await this.patch(`/items/${this.args.key}`, JSON.stringify({ collections: newCollections }), item.version)
     }
 
     if (this.args.removefromcollection) {
@@ -464,14 +463,14 @@ class Zotero {
           newCollections.splice(index, 1)
         }
       })
-      await this.patch(`/items/${this.args.key}`, JSON.stringify({ collections: newCollections }), item.version, this.args.group ? `/groups/${this.args.group}` : null)
+      await this.patch(`/items/${this.args.key}`, JSON.stringify({ collections: newCollections }), item.version)
     }
 
     const params = this.args.filter || {}
     if (this.args.children) {
-      this.show(await this.get(`/items/${this.args.key}/children`, { params }, this.args.group ? `/groups/${this.args.group}` : null))
+      this.show(await this.get(`/items/${this.args.key}/children`, { params }))
     } else {
-      this.show(await this.get(`/items/${this.args.key}`, { params }, this.args.group ? `/groups/${this.args.group}` : null))
+      this.show(await this.get(`/items/${this.args.key}`, { params }))
     }
   }
 

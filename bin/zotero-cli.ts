@@ -243,6 +243,7 @@ class Zotero {
     return request({
       uri,
       headers: this.headers,
+      encoding: null,
       json: options.json,
       resolveWithFullResponse: options.resolveWithFullResponse,
     })
@@ -571,7 +572,7 @@ class Zotero {
       return
     }
 
-    fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`))
+    fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`), 'binary')
   }
 
   async $types(argparser = null) {

@@ -60,14 +60,26 @@ if ($key) {
 };
 
 
-
 sub jq() {
     use IPC::Open2;
+    use open IO => ':encoding(UTF-8)', ':std';
     open2(*README, *WRITEME, "jq", "-M", $_[0]);
+    binmode(*WRITEME, "encoding(UTF-8)");
+    binmode(*README, "encoding(UTF-8)");
     print WRITEME $_[1];
     close(WRITEME);
     my $output = join "",<README>;
     close(README);
     return $output;
 }
-
+sub jqs() {
+    use IPC::Open2;
+    open2(*README, *WRITEME, "jq", "--slurp", "-M", $_[0]);
+    binmode(*WRITEME, "encoding(UTF-8)");
+    binmode(*README, "encoding(UTF-8)");
+    print WRITEME $_[1];
+    close(WRITEME);
+    my $output = join "",<README>;
+    close(README);
+    return $output;
+}

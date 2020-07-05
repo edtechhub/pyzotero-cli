@@ -1,2 +1,2 @@
 
-system(qq{zotero-cli items --filter '{"tag": "_zenodoODE"}'});
+system(qq{zotero-cli items --filter '{"tag": "$ARGV[0]"}'});

@@ -294,6 +294,22 @@ class Zotero {
     })
   }
 
+  async delete(uri, version?: number) {
+    const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
+
+    const headers = { ...this.headers, 'Content-Type': 'application/json' }
+    if (typeof version !== 'undefined') headers['If-Unmodified-Since-Version'] = version
+
+    uri = `${this.base}${prefix}${uri}`
+    if (this.args.verbose) console.error('DELETE', uri)
+
+    return request({
+      method: 'DELETE',
+      uri,
+      headers,
+    })
+  }
+
   async count(uri, params = {}) {
     return (await this.get(uri, { resolveWithFullResponse: true, params })).headers['total-results']
   }
@@ -656,6 +672,20 @@ class Zotero {
 
     for (const uri of this.args.uri) {
       this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root }))
+    }
+  }
+
+  async $delete(argparser = null) {
+    /** Make a direct delete query to the API. */
+
+    if (argparser) {
+      argparser.addArgument('uri', { nargs: '+', help: 'Request uri' })
+      return
+    }
+
+    for (const uri of this.args.uri) {
+      const response = await this.get(uri)
+      await this.delete(uri, response.version)
     }
   }
 }

@@ -679,6 +679,18 @@ class Zotero {
     }
   }
 
+  async $post(argparser = null) {
+    /** Make a direct query to the API. */
+
+    if (argparser) {
+      argparser.addArgument('uri', { nargs: '1', help: 'TODO: document' })
+      argparser.addArgument('--data', { required: true, help: 'Escaped JSON string for post data' })
+      return
+    }
+
+    this.print(await this.post(this.args.uri, this.args.data))
+  }
+
   async $delete(argparser = null) {
     /** Make a direct delete query to the API. */
 

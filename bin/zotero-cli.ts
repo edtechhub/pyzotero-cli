@@ -473,6 +473,8 @@ class Zotero {
       argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
       argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections' })
       argparser.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections' })
+      argparser.addArgument('--addtags', { nargs: '*', help: 'Add tags to item.' })
+      argparser.addArgument('--removetags', { nargs: '*', help: 'Remove tags from item.' })
       return
     }
 
@@ -497,6 +499,21 @@ class Zotero {
         }
       })
       await this.patch(`/items/${this.args.key}`, JSON.stringify({ collections: newCollections }), item.version)
+    }
+
+    if (this.args.addtags) {
+      let newTags = item.data.tags
+      this.args.addtags.forEach(tag => {
+        if (!newTags.find(newTag => newTag.tag === tag)) {
+          newTags.push({ tag })
+        }
+      })
+      await this.patch(`/items/${this.args.key}`, JSON.stringify({ tags: newTags }), item.version)
+    }
+
+    if (this.args.removetags) {
+      let newTags = item.data.tags.filter(tag => !this.args.removetags.includes(tag.tag))
+      await this.patch(`/items/${this.args.key}`, JSON.stringify({ tags: newTags }), item.version)
     }
 
     const params = this.args.filter || {}

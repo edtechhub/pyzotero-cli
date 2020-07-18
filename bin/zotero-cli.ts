@@ -46,7 +46,6 @@ class Zotero {
   parser: any
   config: any
   zotero: any
-  fn: any
   base = 'https://api.zotero.org'
   headers = {
     'User-Agent': 'Zotero-CLI',
@@ -382,7 +381,6 @@ class Zotero {
     if (argparser) {
       argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
       argparser.addArgument('--key', { help: 'Show all the child collections of the key.' })
-      argparser.addArgument('--all', { action: 'storeTrue', help: 'Show all the collections.' })
       argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
       return
     }
@@ -394,13 +392,12 @@ class Zotero {
       return
     }
 
-    this.fn = this.args.all ? this.all : this.get
 
     let collections = null;
     if (this.args.key) {
-      collections = await this.fn(`/collections/${this.args.key}/collections`)
+      collections = await this.all(`/collections/${this.args.key}/collections`)
     } else {
-      collections = await this.fn(`/collections${this.args.top ? '/top' : ''}`)
+      collections = await this.all(`/collections${this.args.top ? '/top' : ''}`)
     }
 
     this.show(collections)

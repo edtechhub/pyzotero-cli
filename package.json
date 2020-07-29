@@ -43,6 +43,7 @@
     "docstring": "^1.1.0",
     "dotenv": "^8.2.0",
     "http-link-header": "^1.0.2",
+    "md5-file": "^5.0.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.5"
   },

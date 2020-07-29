@@ -15,6 +15,8 @@ import * as LinkHeader from 'http-link-header'
 import Ajv = require('ajv')
 const ajv = new Ajv()
 
+const md5 = require('md5-file')
+
 function sleep(msecs) {
   return new Promise(resolve => setTimeout(resolve, msecs))
 }
@@ -249,7 +251,7 @@ class Zotero {
     })
   }
 
-  async post(uri, data) {
+  async post(uri, data, headers = {}) {
     const prefix = this.args.user_id ? `/users/${this.args.user_id}` : `/groups/${this.args.group_id}`
 
     uri = `${this.base}${prefix}${uri}`
@@ -258,7 +260,7 @@ class Zotero {
     return request({
       method: 'POST',
       uri,
-      headers: { ...this.headers, 'Content-Type': 'application/json' },
+      headers: { ...this.headers, 'Content-Type': 'application/json', ...headers },
       body: data,
     })
   }
@@ -472,10 +474,37 @@ class Zotero {
       argparser.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections' })
       argparser.addArgument('--addtags', { nargs: '*', help: 'Add tags to item.' })
       argparser.addArgument('--removetags', { nargs: '*', help: 'Remove tags from item.' })
+      argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item.' })
       return
     }
 
     const item = await this.get(`/items/${this.args.key}`)
+
+    if (this.args.addfile) {
+      const attachmentTemplate = await this.get('/items/new?itemType=attachment&linkMode=imported_file', { userOrGroupPrefix: false })
+      await Promise.all(this.args.addfile.map(async filename => {
+        if (!fs.existsSync(filename)) {
+          console.log(`Ignoring non-existing file: ${filename}`);
+          return
+        }
+
+        let attach = attachmentTemplate;
+        attach.filename = path.basename(filename)
+        attach.contentType = `application/${path.extname(filename).slice(1)}`
+        attach.parentItem = this.args.key
+        const uploadItem = JSON.parse(await this.post('/items', JSON.stringify([attach])))
+        const uploadAuth = JSON.parse(await this.post(`/items/${uploadItem.successful[0].key}/file?md5=${md5.sync(filename)}&filename=${attach.filename}&filesize=${fs.statSync(filename)['size']}&mtime=${new Date().getTime()}`, '{}', { 'If-None-Match': '*' }))
+        if (uploadAuth.exists !== 1) {
+          const uploadResponse = await request({
+            method: 'POST',
+            uri: uploadAuth.url,
+            body: Buffer.concat([Buffer.from(uploadAuth.prefix), fs.readFileSync(filename), Buffer.from(uploadAuth.suffix)]),
+            headers: { 'Content-Type': uploadAuth.contentType }
+          })
+          await this.post(`/items/${uploadItem.successful[0].key}/file?upload=${uploadAuth.uploadKey}`, '{}', { 'Content-Type': 'application/x-www-form-urlencoded', 'If-None-Match': '*' })
+        }
+      }))
+    }
 
     if (this.args.addtocollection) {
       let newCollections = item.data.collections

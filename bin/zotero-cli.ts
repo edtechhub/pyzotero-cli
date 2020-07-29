@@ -491,7 +491,7 @@ class Zotero {
 
     if (this.args.addfile) {
       const attachmentTemplate = await this.get('/items/new?itemType=attachment&linkMode=imported_file', { userOrGroupPrefix: false })
-      await Promise.all(this.args.addfile.map(async filename => {
+      for (const filename of this.args.addfile) {
         if (!fs.existsSync(filename)) {
           console.log(`Ignoring non-existing file: ${filename}`);
           return
@@ -501,6 +501,7 @@ class Zotero {
         attach.filename = path.basename(filename)
         attach.contentType = `application/${path.extname(filename).slice(1)}`
         attach.parentItem = this.args.key
+        console.log(attach)
         const uploadItem = JSON.parse(await this.post('/items', JSON.stringify([attach])))
         const uploadAuth = JSON.parse(await this.post(`/items/${uploadItem.successful[0].key}/file?md5=${md5.sync(filename)}&filename=${attach.filename}&filesize=${fs.statSync(filename)['size']}&mtime=${new Date().getTime()}`, '{}', { 'If-None-Match': '*' }))
         if (uploadAuth.exists !== 1) {
@@ -512,7 +513,7 @@ class Zotero {
           })
           await this.post(`/items/${uploadItem.successful[0].key}/file?upload=${uploadAuth.uploadKey}`, '{}', { 'Content-Type': 'application/x-www-form-urlencoded', 'If-None-Match': '*' })
         }
-      }))
+      }
     }
 
     if (this.args.addtocollection) {

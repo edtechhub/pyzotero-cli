@@ -501,7 +501,6 @@ class Zotero {
         attach.filename = path.basename(filename)
         attach.contentType = `application/${path.extname(filename).slice(1)}`
         attach.parentItem = this.args.key
-        console.log(attach)
         const uploadItem = JSON.parse(await this.post('/items', JSON.stringify([attach])))
         const uploadAuth = JSON.parse(await this.post(`/items/${uploadItem.successful[0].key}/file?md5=${md5.sync(filename)}&filename=${attach.filename}&filesize=${fs.statSync(filename)['size']}&mtime=${new Date().getTime()}`, '{}', { 'If-None-Match': '*' }))
         if (uploadAuth.exists !== 1) {

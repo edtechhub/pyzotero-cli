@@ -475,10 +475,19 @@ class Zotero {
       argparser.addArgument('--addtags', { nargs: '*', help: 'Add tags to item.' })
       argparser.addArgument('--removetags', { nargs: '*', help: 'Remove tags from item.' })
       argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item.' })
+      argparser.addArgument('--savefiles', { nargs: '*', help: 'Download all attachments from the item.' })
       return
     }
 
     const item = await this.get(`/items/${this.args.key}`)
+
+    if (this.args.savefiles) {
+      let children = await this.get(`/items/${this.args.key}/children`);
+      await Promise.all(children.filter(item => item.data.itemType === 'attachment').map(async item => {
+        console.log(`Downloading file ${item.data.filename}`)
+        fs.writeFileSync(item.data.filename, await this.get(`/items/${item.key}/file`), 'binary')
+      }))
+    }
 
     if (this.args.addfile) {
       const attachmentTemplate = await this.get('/items/new?itemType=attachment&linkMode=imported_file', { userOrGroupPrefix: false })

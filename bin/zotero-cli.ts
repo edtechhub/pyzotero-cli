@@ -371,14 +371,17 @@ class Zotero {
   // TODO: Implement --top
   
   async $collection(argparser = null) {
-    /** Retrieve information about a specific collection --key KEY (API: /collections/KEY or /collections/KEY/tags). Use 'collection --help' for details.   */
+    /** 
+	Retrieve information about a specific collection --key KEY (API: /collections/KEY or /collections/KEY/tags). Use 'collection --help' for details.   
+	(Note: Retrieve items is a collection via 'items --collection KEY'.)
+     */
 
     if (argparser) {
       argparser.addArgument('--key', { required: true, help: 'The key of the collection (required).' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
       // argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
-      argparser.addArgument('--add', { nargs: '*', help: 'Convenience method: Add items to this collection. Note that adding items to collections with \'item --addtocollection\' may require fewer API queries.' })
-      argparser.addArgument('--remove', { nargs: '*', help: 'Convenience method: Remove items from this collection. Note that removing items from collections with \'item --removefromcollection\' may require fewer API queries.' })
+      argparser.addArgument('--add', { nargs: '*', help: 'Add items to this collection. Note that adding items to collections with \'item --addtocollection\' may require fewer API queries. (Convenience method: patch item->data->collections.)' })
+      argparser.addArgument('--remove', { nargs: '*', help: 'Convenience method: Remove items from this collection. Note that removing items from collections with \'item --removefromcollection\' may require fewer API queries. (Convenience method: patch item->data->collections.)' })
       return
     }
 
@@ -428,7 +431,11 @@ class Zotero {
   // <userOrGroupPrefix>/items/top	Top-level items in the library, excluding trashed items
  
   async $items(argparser = null) {
-    /** Retrieve list of items from API. (API: /items, /items/top, /collections/COLLECTION/items/top). Use 'items --help' for details. By default, all items are retrieved. With --top or limit (via --filter) the default number of items are retrieved. */
+    /** 
+	Retrieve list of items from API. (API: /items, /items/top, /collections/COLLECTION/items/top). 
+	Use 'items --help' for details. 
+	By default, all items are retrieved. With --top or limit (via --filter) the default number of items are retrieved. 
+    */
 
     let items
 
@@ -436,9 +443,9 @@ class Zotero {
       argparser.addArgument('--count', { action: 'storeTrue', help: 'Return the number of items.' })
       // argparser.addArgument('--all', { action: 'storeTrue', help: 'obsolete' })
       argparser.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
-      argparser.addArgument('--collection', { help: 'Retrive list of items for collection' })
-      argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection, excluding trashed items' })
-      argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype' })
+      argparser.addArgument('--collection', { help: 'Retrive list of items for collection.' })
+      argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection, excluding trashed items.' })
+      argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype.' })
       return
     }
 
@@ -491,11 +498,16 @@ class Zotero {
   // <userOrGroupPrefix>/items/<itemKey>/children	Child items under a specific item
   
   async $item(argparser = null) {
-    /** Retrieve children for item --key KEY. (API: /items/KEY/ or /items/KEY/children) */
+    /** 
+	Retrieve an item (item --key KEY), save/add file attachments, retrieve children. Manage collections and tags. (API: /items/KEY/ or /items/KEY/children). 
+
+	Also see 'attachment', 'create' and 'update'.
+    */
+
     if (argparser) {
       argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
-      argparser.addArgument('--children', { action: 'storeTrue', help: 'TODO: document' })
-      argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
+      argparser.addArgument('--children', { action: 'storeTrue', help: 'Retrieve list of children for the item.' })
+      argparser.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "itemkey": "A,B,C"}\'. See https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.' })
       argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item. (/items/new)' })
       argparser.addArgument('--savefiles', { nargs: '*', help: 'Download all attachments from the item (/items/KEY/file).' })
       argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections. (Convenience method: patch item->data->collections.)' })
@@ -588,20 +600,26 @@ class Zotero {
   }
 
   async $attachment(argparser = null) {
-    /** Retrieve/save attachments for the item specified with --key KEY. (API: /items/KEY/file) */
+    /** 
+	Retrieve/save file attachments for the item specified with --key KEY (API: /items/KEY/file). 
+	Also see 'item', which has options for adding/saving file attachments. 
+    */
 
     if (argparser) {
       argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
-      argparser.addArgument('--save', { required: true, help: 'Filename to save attachment to' })
+      argparser.addArgument('--save', { required: true, help: 'Filename to save attachment to.' })
       return
     }
 
     fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`), 'binary')
   }
 
-
   async $create_item(argparser = null) {
-    /** Create a new item or items. (API: /items/new) You can retrieve a template with the --template option.  */
+    /** 
+	Create a new item or items. (API: /items/new) You can retrieve a template with the --template option.  
+
+	Use this option to create both top-level items, as well as child items (including notes and links).
+    */
 
     if (argparser) {
       argparser.addArgument('--template', { help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'." })
@@ -625,8 +643,8 @@ class Zotero {
 
     if (argparser) {
       argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
-      argparser.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item[s] by sumbitting the complete json.' })
-      argparser.addArgument('items', { nargs: 1, help: 'Path of one or more item files in json format.' })
+      argparser.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item by sumbitting the complete json.' })
+      argparser.addArgument('items', { nargs: 1, help: 'Path of item files in json format.' })
       return
     }
 

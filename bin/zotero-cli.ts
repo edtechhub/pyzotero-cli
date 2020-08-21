@@ -335,7 +335,7 @@ class Zotero {
   // TODO: --create-child should go into 'collection'.
   
   async $collections(argparser = null) {
-    /** Retrieve a list of collections or create a collection. (API: /collections, /collections/top, /collections/<collectionKey>/collections) */
+    /** Retrieve a list of collections or create a collection. (API: /collections, /collections/top, /collections/<collectionKey>/collections). Use 'collections --help' for details. */
 
     if (argparser) {
       argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
@@ -371,10 +371,10 @@ class Zotero {
   // TODO: Implement --top
   
   async $collection(argparser = null) {
-    /** Retrieve information about a specific collection --key KEY (API: /collections/KEY or /collections/KEY/tags)   */
+    /** Retrieve information about a specific collection --key KEY (API: /collections/KEY or /collections/KEY/tags). Use 'collection --help' for details.   */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the collection.' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the collection (required).' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
       argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
       argparser.addArgument('--add', { action: 'storeTrue', help: 'Add items to this collection.' })
@@ -423,7 +423,7 @@ class Zotero {
   // <userOrGroupPrefix>/items/top	Top-level items in the library, excluding trashed items
  
   async $items(argparser = null) {
-    /** Retrieve a list of items items the library, e.g. collection/top. (API: /items/...) */
+    /** Retrieve list of items from API. (API: /items, /items/top, /collections/COLLECTION/items/top). Use 'items --help' for details. */
 
     let items
 
@@ -641,7 +641,6 @@ class Zotero {
     const items = await this.get('/items/trash')
     this.show(items)
   }
-
 
   
   // https://www.zotero.org/support/dev/web_api/v3/basics

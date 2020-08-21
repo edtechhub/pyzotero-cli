@@ -377,8 +377,8 @@ class Zotero {
       argparser.addArgument('--key', { required: true, help: 'The key of the collection (required).' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
       // argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
-      argparser.addArgument('--add', { nargs: '*', help: 'Add items to this collection.' })
-      argparser.addArgument('--remove', { nargs: '*', help: 'Remove items from this collection.' })
+      argparser.addArgument('--add', { nargs: '*', help: 'Convenience method: Add items to this collection. Note that adding items to collections with \'item --addtocollection\' may require fewer API queries.' })
+      argparser.addArgument('--remove', { nargs: '*', help: 'Convenience method: Remove items from this collection. Note that removing items from collections with \'item --removefromcollection\' may require fewer API queries.' })
       return
     }
 
@@ -428,16 +428,16 @@ class Zotero {
   // <userOrGroupPrefix>/items/top	Top-level items in the library, excluding trashed items
  
   async $items(argparser = null) {
-    /** Retrieve list of items from API. (API: /items, /items/top, /collections/COLLECTION/items/top). Use 'items --help' for details. */
+    /** Retrieve list of items from API. (API: /items, /items/top, /collections/COLLECTION/items/top). Use 'items --help' for details. By default, all items are retrieved. With --top or limit (via --filter) the default number of items are retrieved. */
 
     let items
 
     if (argparser) {
-      argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
-      argparser.addArgument('--all', { action: 'storeTrue', help: 'TODO: document' })
-      argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
+      argparser.addArgument('--count', { action: 'storeTrue', help: 'Return the number of items.' })
+      // argparser.addArgument('--all', { action: 'storeTrue', help: 'obsolete' })
+      argparser.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
       argparser.addArgument('--collection', { help: 'Retrive list of items for collection' })
-      argparser.addArgument('--top', { action: 'storeTrue', help: 'TODO: document' })
+      argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection, excluding trashed items' })
       argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype' })
       return
     }

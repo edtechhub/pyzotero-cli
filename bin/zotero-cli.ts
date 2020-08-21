@@ -62,6 +62,7 @@ class Zotero {
     this.parser.addArgument('--config', { type: arg.file, help: 'Configuration file (toml format). Note that ./zotero-cli.toml and ~/.config/zotero-cli/zotero-cli.toml is picked up automatically.' })
     this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
     this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
+    // See below. If changed, add: You can provide the group-id as zotero-select link (zotero://...). Only the group-id is used, the item/collection id is discarded.
     this.parser.addArgument('--indent', { type: arg.integer, help: 'Identation for json output.' })
     this.parser.addArgument('--out', { help: 'Output to file' })
     this.parser.addArgument('--verbose', { action: 'storeTrue', help: 'Log requests.' })
@@ -171,6 +172,18 @@ class Zotero {
     if (this.args.user_id !== null && this.args.group_id !== null) this.parser.error('You must provide exactly one of --user-id or --group-id')
     if (this.args.user_id === 0) this.args.user_id = (await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false })).userID
 
+
+    /*
+    // Could do this here:
+    if (this.args.group_id) {
+      this.args.group_id = this.extractGroup(this.args.group_id)
+      if (!this.args.group_id) {
+	this.parser.error('Unable to extract group_id from the string provided via --group_id.')
+	return
+      }    
+    }
+    */
+    
     // using default=2 above prevents the overrides from being picked up
     if (this.args.indent === null) this.args.indent = 2
 

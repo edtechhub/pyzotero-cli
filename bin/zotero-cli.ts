@@ -367,7 +367,7 @@ class Zotero {
   // <userOrGroupPrefix>/collections/<collectionKey>/items/top	Top-level items within a specific collection in the library
 
   // TODO: --create-child should go into 'collection'.
-  // TODO: Why is does the setup for --add and --remove differ? Should 'add' not be "nargs: '*'"? Remove 'itemkeys'?
+  // DONE: Why is does the setup for --add and --remove differ? Should 'add' not be "nargs: '*'"? Remove 'itemkeys'?
   // TODO: Implement --top
   
   async $collection(argparser = null) {
@@ -376,8 +376,8 @@ class Zotero {
     if (argparser) {
       argparser.addArgument('--key', { required: true, help: 'The key of the collection (required).' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
-      argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
-      argparser.addArgument('--add', { action: 'storeTrue', help: 'Add items to this collection.' })
+      // argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
+      argparser.addArgument('--add', { nargs: '*', help: 'Add items to this collection.' })
       argparser.addArgument('--remove', { nargs: '*', help: 'Remove items from this collection.' })
       return
     }
@@ -386,6 +386,11 @@ class Zotero {
       this.parser.error('--tags cannot be combined with --add')
       return
     }
+    if (this.args.tags && this.args.remove) {
+      this.parser.error('--tags cannot be combined with --remove')
+      return
+    }
+    /*
     if (this.args.add && !this.args.itemkeys.length) {
       this.parser.error('--add requires item keys')
       return
@@ -394,9 +399,9 @@ class Zotero {
       this.parser.error('unexpected item keys')
       return
     }
-
+    */
     if (this.args.add) {
-      for (const itemKey of this.args.itemkeys) {
+      for (const itemKey of this.args.add) {
         const item = await this.get(`/items/${itemKey}`)
         if (item.data.collections.includes(this.args.key)) continue
         await this.patch(`/items/${itemKey}`, JSON.stringify({ collections: item.data.collections.concat(this.args.key) }), item.version)

@@ -225,6 +225,8 @@ class Zotero {
     return data
   }
 
+  // The Zotero API uses several commands: get, post, patch, delete - these are defined below.
+    
   async get(uri, options: { userOrGroupPrefix?: boolean, params?: any, resolveWithFullResponse?: boolean, json?: boolean } = {}) {
     if (typeof options.userOrGroupPrefix === 'undefined') options.userOrGroupPrefix = true
     if (typeof options.params === 'undefined') options.params = {}
@@ -321,23 +323,61 @@ class Zotero {
   }
 
   /// THE COMMANDS ///
+  // The following functions define key API commands: /keys, /collection, /collections, etc.
 
-  async $key(argparser = null) {
-    /** Show details about this API key. (API: /keys ) */
+  // https://www.zotero.org/support/dev/web_api/v3/basics
+  // Collections
+  // <userOrGroupPrefix>/collections	Collections in the library
+  // <userOrGroupPrefix>/collections/top	Top-level collections in the library
+  // <userOrGroupPrefix>/collections/<collectionKey>	A specific collection in the library
+  // <userOrGroupPrefix>/collections/<collectionKey>/collections	Subcollections within a specific collection in the library
 
-    if (argparser) return
-
-    this.show(await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false }))
-  }
-
-  async $collection(argparser = null) {
-    /** Retrieve information about a specific collection --key KEY (API: /collection/KEY or /collection/KEY/tags)   */
+  // TODO: --create-child should go into 'collection'.
+  
+  async $collections(argparser = null) {
+    /** Retrieve a list of collections or create a collection. (API: /collections, /collections/top, /collections/<collectionKey>/collections) */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
+      argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
+      argparser.addArgument('--key', { help: 'Show all the child collections of the key.' })
+      argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
+      return
+    }
+
+    if (this.args.create_child) {
+      const response = await this.post('/collections',
+        JSON.stringify(this.args.create_child.map(c => { return { name: c, parentCollection: this.args.key } })))
+      this.print('Collections created: ', JSON.parse(response).successful)
+      return
+    }
+
+
+    let collections = null;
+    if (this.args.key) {
+      collections = await this.all(`/collections/${this.args.key}/collections`)
+    } else {
+      collections = await this.all(`/collections${this.args.top ? '/top' : ''}`)
+    }
+
+    this.show(collections)
+  }
+
+  // Operate on a specific collection.
+  // <userOrGroupPrefix>/collections/<collectionKey>/items	Items within a specific collection in the library
+  // <userOrGroupPrefix>/collections/<collectionKey>/items/top	Top-level items within a specific collection in the library
+
+  // TODO: --create-child should go into 'collection'.
+  // TODO: Why is does the setup for --add and --remove differ? Should 'add' not be "nargs: '*'"? Remove 'itemkeys'?
+  // TODO: Implement --top
+  
+  async $collection(argparser = null) {
+    /** Retrieve information about a specific collection --key KEY (API: /collections/KEY or /collections/KEY/tags)   */
+
+    if (argparser) {
+      argparser.addArgument('--key', { required: true, help: 'The key of the collection.' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
+      argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
       argparser.addArgument('--add', { action: 'storeTrue', help: 'Add items to this collection.' })
-      argparser.addArgument('itemkeys', { nargs: '*' })
       argparser.addArgument('--remove', { nargs: '*', help: 'Remove items from this collection.' })
       return
     }
@@ -376,35 +416,12 @@ class Zotero {
 
     this.show(await this.get(`/collections/${this.args.key}${this.args.tags ? '/tags' : ''}`))
   }
-
-  async $collections(argparser = null) {
-    /** Retrieve a list of collections or create a collection. (API: /collections or /collection/top) */
-
-    if (argparser) {
-      argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
-      argparser.addArgument('--key', { help: 'Show all the child collections of the key.' })
-      argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
-      return
-    }
-
-    if (this.args.create_child) {
-      const response = await this.post('/collections',
-        JSON.stringify(this.args.create_child.map(c => { return { name: c, parentCollection: this.args.key } })))
-      this.print('Collections created: ', JSON.parse(response).successful)
-      return
-    }
-
-
-    let collections = null;
-    if (this.args.key) {
-      collections = await this.all(`/collections/${this.args.key}/collections`)
-    } else {
-      collections = await this.all(`/collections${this.args.top ? '/top' : ''}`)
-    }
-
-    this.show(collections)
-  }
-
+  
+  // URI	Description
+  // https://www.zotero.org/support/dev/web_api/v3/basics
+  // <userOrGroupPrefix>/items	All items in the library, excluding trashed items
+  // <userOrGroupPrefix>/items/top	Top-level items in the library, excluding trashed items
+ 
   async $items(argparser = null) {
     /** Retrieve a list of items items from the library, e.g. collection/top. (API: /items/...) */
 
@@ -464,6 +481,10 @@ class Zotero {
     }
   }
 
+  // https://www.zotero.org/support/dev/web_api/v3/basics
+  // <userOrGroupPrefix>/items/<itemKey>	A specific item in the library
+  // <userOrGroupPrefix>/items/<itemKey>/children	Child items under a specific item
+  
   async $item(argparser = null) {
     /** Retrieve children for item --key KEY. (API: /items/KEY/ or /items/KEY/children) */
     if (argparser) {
@@ -561,82 +582,6 @@ class Zotero {
     }
   }
 
-  async $publications(argparser = null) {
-    /** Return a list of items in publications (user library only). (API: /publications/items) */
-
-    if (argparser) return
-
-    const items = await this.get('/publications/items')
-    this.show(items)
-  }
-
-  async $trash(argparser = null) {
-    /** Return a list of items in the trash. */
-
-    if (argparser) return
-
-    const items = await this.get('/items/trash')
-    this.show(items)
-  }
-
-  async $tags(argparser = null) {
-    /** Return a list of tags in the library. Options to filter and count tags. (API: /tags) */
-
-    if (argparser) {
-      argparser.addArgument('--filter', { help: 'Tags of all types matching a specific name.' })
-      argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
-      return
-    }
-
-    let rawTags = null;
-    if (this.args.filter) {
-      rawTags = await this.all(`/tags/${encodeURIComponent(this.args.filter)}`)
-    } else {
-      rawTags = await this.all('/tags')
-    }
-    const tags = rawTags.map(tag => tag.tag).sort()
-
-    if (this.args.count) {
-      const tag_counts: Record<string, number> = {}
-      for (const tag of tags) {
-        tag_counts[tag] = await this.count('/items', { tag })
-      }
-      this.print(tag_counts)
-
-    } else {
-      this.show(tags)
-    }
-  }
-
-  async $searches(argparser = null) {
-    /** Return/Create a list of the saved searches of the library. (API: /searches) */
-
-    if (argparser) {
-      argparser.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
-      return
-    }
-
-    if (this.args.create) {
-      let searchDef = [];
-      try {
-        searchDef = JSON.parse(fs.readFileSync(this.args.create[0], 'utf8'))
-      } catch (ex) {
-        console.log('Invalid search definition: ', ex)
-      }
-
-      if (!Array.isArray(searchDef)) {
-        searchDef = [searchDef]
-      }
-
-      await this.post('/searches', JSON.stringify(searchDef))
-      this.print('Saved search(s) created successfully.')
-      return
-    }
-
-    const items = await this.get('/searches')
-    this.show(items)
-  }
-
   async $attachment(argparser = null) {
     /** Retrieve/save attachments for the item specified with --key KEY. (API: /items/KEY/file) */
 
@@ -649,39 +594,6 @@ class Zotero {
     fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`), 'binary')
   }
 
-  async $types(argparser = null) {
-    /** Retrieve a list of items types available in Zotero. (API: /itemTypes) */
-
-    if (argparser) return
-
-    this.show(await this.get('/itemTypes', { userOrGroupPrefix: false }))
-  }
-
-  async $groups(argparser = null) {
-    /** Retrieve the Zotero groups data to which the current library_id and api_key has access to. (API: /users/<user-id>/groups) */
-    if (argparser) return
-
-    this.show(await this.get('/groups'))
-  }
-
-  async $fields(argparser = null) {
-    /**
-     * Retrieve a template with the fields for --type TYPE (API: /itemTypeFields, /itemTypeCreatorTypes) or all item fields (API: /itemFields).
-     * Note that to retrieve a template, use 'create-item --template TYPE' rather than this command.
-     */
-
-    if (argparser) {
-      argparser.addArgument('--type', { help: 'Display fields types for TYPE.' })
-      return
-    }
-
-    if (this.args.type) {
-      this.show(await this.get('/itemTypeFields', { params: { itemType: this.args.type }, userOrGroupPrefix: false }))
-      this.show(await this.get('/itemTypeCreatorTypes', { params: { itemType: this.args.type }, userOrGroupPrefix: false }))
-    } else {
-      this.show(await this.get('/itemFields', { userOrGroupPrefix: false }))
-    }
-  }
 
   async $create_item(argparser = null) {
     /** Create a new item or items. (API: /items/new) You can retrieve a template with the --template option.  */
@@ -719,6 +631,144 @@ class Zotero {
     }
   }
 
+  
+  // https://www.zotero.org/support/dev/web_api/v3/basics
+  // <userOrGroupPrefix>/items/trash	Items in the trash
+  // <userOrGroupPrefix>/publications/items	Items in My Publications  
+
+  async $publications(argparser = null) {
+    /** Return a list of items in publications (user library only). (API: /publications/items) */
+
+    if (argparser) return
+
+    const items = await this.get('/publications/items')
+    this.show(items)
+  }
+
+  async $trash(argparser = null) {
+    /** Return a list of items in the trash. */
+
+    if (argparser) return
+
+    const items = await this.get('/items/trash')
+    this.show(items)
+  }
+
+  
+  // itemTypes
+
+  async $types(argparser = null) {
+    /** Retrieve a list of items types available in Zotero. (API: /itemTypes) */
+
+    if (argparser) return
+
+    this.show(await this.get('/itemTypes', { userOrGroupPrefix: false }))
+  }
+
+  async $groups(argparser = null) {
+    /** Retrieve the Zotero groups data to which the current library_id and api_key has access to. (API: /users/<user-id>/groups) */
+    if (argparser) return
+
+    this.show(await this.get('/groups'))
+  }
+
+  async $fields(argparser = null) {
+    /**
+     * Retrieve a template with the fields for --type TYPE (API: /itemTypeFields, /itemTypeCreatorTypes) or all item fields (API: /itemFields).
+     * Note that to retrieve a template, use 'create-item --template TYPE' rather than this command.
+     */
+
+    if (argparser) {
+      argparser.addArgument('--type', { help: 'Display fields types for TYPE.' })
+      return
+    }
+
+    if (this.args.type) {
+      this.show(await this.get('/itemTypeFields', { params: { itemType: this.args.type }, userOrGroupPrefix: false }))
+      this.show(await this.get('/itemTypeCreatorTypes', { params: { itemType: this.args.type }, userOrGroupPrefix: false }))
+    } else {
+      this.show(await this.get('/itemFields', { userOrGroupPrefix: false }))
+    }
+  }
+
+  // Searches
+  // https://www.zotero.org/support/dev/web_api/v3/basics
+  
+  async $searches(argparser = null) {
+    /** Return/Create a list of the saved searches of the library. (API: /searches) */
+
+    if (argparser) {
+      argparser.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
+      return
+    }
+
+    if (this.args.create) {
+      let searchDef = [];
+      try {
+        searchDef = JSON.parse(fs.readFileSync(this.args.create[0], 'utf8'))
+      } catch (ex) {
+        console.log('Invalid search definition: ', ex)
+      }
+
+      if (!Array.isArray(searchDef)) {
+        searchDef = [searchDef]
+      }
+
+      await this.post('/searches', JSON.stringify(searchDef))
+      this.print('Saved search(s) created successfully.')
+      return
+    }
+
+    const items = await this.get('/searches')
+    this.show(items)
+  }
+  
+  // Tags
+  
+  async $tags(argparser = null) {
+    /** Return a list of tags in the library. Options to filter and count tags. (API: /tags) */
+
+    if (argparser) {
+      argparser.addArgument('--filter', { help: 'Tags of all types matching a specific name.' })
+      argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
+      return
+    }
+
+    let rawTags = null;
+    if (this.args.filter) {
+      rawTags = await this.all(`/tags/${encodeURIComponent(this.args.filter)}`)
+    } else {
+      rawTags = await this.all('/tags')
+    }
+    const tags = rawTags.map(tag => tag.tag).sort()
+
+    if (this.args.count) {
+      const tag_counts: Record<string, number> = {}
+      for (const tag of tags) {
+        tag_counts[tag] = await this.count('/items', { tag })
+      }
+      this.print(tag_counts)
+
+    } else {
+      this.show(tags)
+    }
+  }
+  
+  // Other URLs
+  // https://www.zotero.org/support/dev/web_api/v3/basics
+  // /keys/<key>	
+  // /users/<userID>/groups	
+  
+  async $key(argparser = null) {
+    /** Show details about this API key. (API: /keys ) */
+
+    if (argparser) return
+
+    this.show(await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false }))
+  }
+
+  // Functions for get, post, put, patch, delete,...
+  
   async $get(argparser = null) {
     /** Make a direct query to the API. */
 

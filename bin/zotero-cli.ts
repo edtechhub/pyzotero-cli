@@ -505,8 +505,14 @@ class Zotero {
     const params = this.args.filter || {}
 
     if (this.args.top) {
-      items = await this.get(`${collection}/items/top`, { params })
+      // This should be all - there may be more than 100 items.
+      // items = await this.all(`${collection}/items/top`, { params })
+      items = await this.all(`${collection}/items/top`, params )
     } else if (params.limit) {
+      if (params.limit > 100) {
+	this.parser.error('You can only retrieve up to 100 items with with params.limit.')
+	return
+      }
       items = await this.get(`${collection}/items`, { params })
     } else {
       items = await this.all(`${collection}/items`, params)

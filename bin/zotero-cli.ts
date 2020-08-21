@@ -423,7 +423,7 @@ class Zotero {
   // <userOrGroupPrefix>/items/top	Top-level items in the library, excluding trashed items
  
   async $items(argparser = null) {
-    /** Retrieve a list of items items from the library, e.g. collection/top. (API: /items/...) */
+    /** Retrieve a list of items items the library, e.g. collection/top. (API: /items/...) */
 
     let items
 
@@ -491,12 +491,12 @@ class Zotero {
       argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
       argparser.addArgument('--children', { action: 'storeTrue', help: 'TODO: document' })
       argparser.addArgument('--filter', { type: arg.json, help: 'TODO: document' })
-      argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections' })
-      argparser.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections' })
-      argparser.addArgument('--addtags', { nargs: '*', help: 'Add tags to item.' })
-      argparser.addArgument('--removetags', { nargs: '*', help: 'Remove tags from item.' })
-      argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item.' })
-      argparser.addArgument('--savefiles', { nargs: '*', help: 'Download all attachments from the item.' })
+      argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item. (/items/new)' })
+      argparser.addArgument('--savefiles', { nargs: '*', help: 'Download all attachments from the item (/items/KEY/file).' })
+      argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections. (Convenience method: patch item->data->collections.)' })
+      argparser.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections. (Convenience method: patch item->data->collections.)' })
+      argparser.addArgument('--addtags', { nargs: '*', help: 'Add tags to item. (Convenience method: patch item->data->tags.)' })
+      argparser.addArgument('--removetags', { nargs: '*', help: 'Remove tags from item. (Convenience method: patch item->data->tags.)' })
       return
     }
 
@@ -631,9 +631,20 @@ class Zotero {
     }
   }
 
+  // <userOrGroupPrefix>/items/trash	Items in the trash
+  
+  async $trash(argparser = null) {
+    /** Return a list of items in the trash. */
+
+    if (argparser) return
+
+    const items = await this.get('/items/trash')
+    this.show(items)
+  }
+
+
   
   // https://www.zotero.org/support/dev/web_api/v3/basics
-  // <userOrGroupPrefix>/items/trash	Items in the trash
   // <userOrGroupPrefix>/publications/items	Items in My Publications  
 
   async $publications(argparser = null) {
@@ -644,16 +655,6 @@ class Zotero {
     const items = await this.get('/publications/items')
     this.show(items)
   }
-
-  async $trash(argparser = null) {
-    /** Return a list of items in the trash. */
-
-    if (argparser) return
-
-    const items = await this.get('/items/trash')
-    this.show(items)
-  }
-
   
   // itemTypes
 
@@ -767,10 +768,10 @@ class Zotero {
     this.show(await this.get(`/keys/${this.args.api_key}`, { userOrGroupPrefix: false }))
   }
 
-  // Functions for get, post, put, patch, delete,...
+  // Functions for get, post, put, patch, delete. (Delete query to API with uri.)
   
   async $get(argparser = null) {
-    /** Make a direct query to the API. */
+    /** Make a direct query to the API using 'GET uri'. */
 
     if (argparser) {
       argparser.addArgument('--root', { action: 'storeTrue', help: 'TODO: document' })
@@ -784,7 +785,7 @@ class Zotero {
   }
 
   async $post(argparser = null) {
-    /** Make a direct query to the API. */
+    /** Make a direct query to the API using 'POST uri [--data data]'. */
 
     if (argparser) {
       argparser.addArgument('uri', { nargs: '1', help: 'TODO: document' })
@@ -796,7 +797,7 @@ class Zotero {
   }
 
   async $put(argparser = null) {
-    /** Make a direct query to the API. */
+    /** Make a direct query to the API using 'PUT uri [--data data]'. */
 
     if (argparser) {
       argparser.addArgument('uri', { nargs: '1', help: 'TODO: document' })
@@ -808,7 +809,7 @@ class Zotero {
   }
 
   async $delete(argparser = null) {
-    /** Make a direct delete query to the API. */
+    /** Make a direct delete query to the API using 'DELETE uri'. */
 
     if (argparser) {
       argparser.addArgument('uri', { nargs: '+', help: 'Request uri' })

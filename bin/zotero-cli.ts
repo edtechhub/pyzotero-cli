@@ -322,6 +322,23 @@ class Zotero {
     this.print(JSON.stringify(v, null, this.args.indent).replace(new RegExp(this.args.api_key, 'g'), '<API-KEY>'))
   }
 
+  extractKeyAndSetGroup(key) {
+    // zotero://select/groups/(\d+)/(items|collections)/([A-Z01-9]+)
+    var out = key;
+    var res = key.match(/^zotero\:\/\/select\/groups\/(library|\d+)\/(items|collections)\/([A-Z01-9]+)/)
+    if (res) {
+      if (res[2] == "library") {
+	console.log('You cannot specify zotero-select links (zotero://...) to select user libraries.')
+	return 
+      } else {
+	// console.log("Key: zotero://-key provided for "+res[2]+" Setting group-id.")
+	this.args.group_id = res[1]
+	out = res[3]
+      };
+    }
+    return out
+  }
+  
   /// THE COMMANDS ///
   // The following functions define key API commands: /keys, /collection, /collections, etc.
 
@@ -339,9 +356,17 @@ class Zotero {
 
     if (argparser) {
       argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
-      argparser.addArgument('--key', { help: 'Show all the child collections of the key.' })
+      argparser.addArgument('--key', { help: 'Show all the child collections of collection with key. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
       argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
       return
+    }
+
+    if (this.args.key) {
+      this.args.key = this.extractKeyAndSetGroup(this.args.key)
+      if (!this.args.key) {
+	this.parser.error('Unable to extract group/key from the string provided.')
+	return
+      }    
     }
 
     if (this.args.create_child) {
@@ -368,7 +393,7 @@ class Zotero {
 
   // TODO: --create-child should go into 'collection'.
   // DONE: Why is does the setup for --add and --remove differ? Should 'add' not be "nargs: '*'"? Remove 'itemkeys'?
-  // TODO: Implement --top
+  // TODO: Add option "--output file.json" to pipe output to file.
   
   async $collection(argparser = null) {
     /** 
@@ -377,7 +402,7 @@ class Zotero {
      */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the collection (required).' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the collection (required). You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
       argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
       // argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
       argparser.addArgument('--add', { nargs: '*', help: 'Add items to this collection. Note that adding items to collections with \'item --addtocollection\' may require fewer API queries. (Convenience method: patch item->data->collections.)' })
@@ -385,6 +410,14 @@ class Zotero {
       return
     }
 
+    if (this.args.key) {
+      this.args.key = this.extractKeyAndSetGroup(this.args.key)
+      if (!this.args.key) {
+	this.parser.error('Unable to extract group/key from the string provided.')
+	return
+      }    
+    }
+    
     if (this.args.tags && this.args.add) {
       this.parser.error('--tags cannot be combined with --add')
       return
@@ -443,8 +476,8 @@ class Zotero {
       argparser.addArgument('--count', { action: 'storeTrue', help: 'Return the number of items.' })
       // argparser.addArgument('--all', { action: 'storeTrue', help: 'obsolete' })
       argparser.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
-      argparser.addArgument('--collection', { help: 'Retrive list of items for collection.' })
-      argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection, excluding trashed items.' })
+      argparser.addArgument('--collection', { help: 'Retrive list of items for collection. You can provide the collection key as a zotero-select link (zotero://...) to also set the group-id.' })
+      argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection (excluding child items / attachments, excluding trashed items).' })
       argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype.' })
       return
     }
@@ -454,6 +487,14 @@ class Zotero {
       return
     }
 
+    if (this.args.collection) {
+      this.args.collection = this.extractKeyAndSetGroup(this.args.collection)
+      if (!this.args.collection) {
+	this.parser.error('Unable to extract group/key from the string provided.')
+	return
+      }    
+    }
+    
     const collection = this.args.collection ? `/collections/${this.args.collection}` : ''
 
     if (this.args.count) {
@@ -505,7 +546,7 @@ class Zotero {
     */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
       argparser.addArgument('--children', { action: 'storeTrue', help: 'Retrieve list of children for the item.' })
       argparser.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "itemkey": "A,B,C"}\'. See https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.' })
       argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item. (/items/new)' })
@@ -517,6 +558,15 @@ class Zotero {
       return
     }
 
+
+    if (this.args.key) {
+      this.args.key = this.extractKeyAndSetGroup(this.args.key)
+      if (!this.args.key) {
+	this.parser.error('Unable to extract group/key from the string provided.')
+	return
+      }    
+    }
+    
     const item = await this.get(`/items/${this.args.key}`)
 
     if (this.args.savefiles) {
@@ -606,11 +656,19 @@ class Zotero {
     */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
       argparser.addArgument('--save', { required: true, help: 'Filename to save attachment to.' })
       return
     }
 
+    if (this.args.key) {
+      this.args.key = this.extractKeyAndSetGroup(this.args.key)
+      if (!this.args.key) {
+	this.parser.error('Unable to extract group/key from the string provided.')
+	return
+      }    
+    }
+    
     fs.writeFileSync(this.args.save, await this.get(`/items/${this.args.key}/file`), 'binary')
   }
 
@@ -642,12 +700,20 @@ class Zotero {
     /** Update/replace an item (--key KEY), either update (API: patch /items/KEY) or replacing (using --replace, API: put /items/KEY). */
 
     if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the item.' })
+      argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
       argparser.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item by sumbitting the complete json.' })
       argparser.addArgument('items', { nargs: 1, help: 'Path of item files in json format.' })
       return
     }
 
+    if (this.args.key) {
+      this.args.key = this.extractKeyAndSetGroup(this.args.key)
+      if (!this.args.key) {
+	this.parser.error('Unable to extract group/key from the string provided.')
+	return
+      }    
+    }
+    
     const originalItem = await this.get(`/items/${this.args.key}`)
     for (const item of this.args.items) {
       await this[this.args.replace ? 'put' : 'patch'](`/items/${this.args.key}`, fs.readFileSync(item), originalItem.version)
@@ -718,7 +784,7 @@ class Zotero {
   // https://www.zotero.org/support/dev/web_api/v3/basics
   
   async $searches(argparser = null) {
-    /** Return/Create a list of the saved searches of the library. (API: /searches) */
+    /** Return a list of the saved searches of the library. Create new saved searches. (API: /searches) */
 
     if (argparser) {
       argparser.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })

@@ -1,11 +1,1 @@
-declare const os: any;
-declare const TOML: any;
-declare const fs: any;
-declare const path: any;
-declare const request: any;
-declare const LinkHeader: any;
-declare const ajv: any;
-declare const parse: any;
-declare var async: any;
-declare const ArgumentParser: any, argparser: any;
-declare const md5: any;
+export {};

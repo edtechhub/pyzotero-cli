@@ -6,16 +6,18 @@ const os = require('os');
 
 // import { ArgumentParser } from 'argparse'
 const { ArgumentParser } = require('argparse');
-const TOML = require('@iarna/toml');
+// var Toml = require('toml');
+
+const toml = require('@iarna/toml');
 const fs = require('fs');
 const path = require('path');
 const request = require('request-promise');
-const { LinkHeader } = require('http-link-header');
+const LinkHeader = require('http-link-header');
 const Ajv = require('ajv');
 const { parse } = require("args-any");
+// var toml = require('toml');
 
 
-// import { parse as TOML } from '@iarna/toml'
 // import fs = require('fs')
 // import path = require('path')
 
@@ -64,6 +66,7 @@ export class Zotero {
     'Zotero-API-Version': '3',
   }
 
+  //move it to cli 
   async run() {
     this.output = ''
     // global parameters for all commands
@@ -91,8 +94,9 @@ export class Zotero {
     this.args = this.parser.parseArgs()
 
     // pick up config
+
     const config: string = [this.args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`].find(cfg => fs.existsSync(cfg))
-    this.config = config ? TOML(fs.readFileSync(config, 'utf-8')) : {}
+    this.config = config ? toml.parse(fs.readFileSync(config, 'utf-8')) : {}
 
     if (this.args.user_id || this.args.group_id) {
       //Overwriting command line option in config

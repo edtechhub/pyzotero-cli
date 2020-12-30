@@ -6,18 +6,18 @@ const os = require('os');
 
 // import { ArgumentParser } from 'argparse'
 const { ArgumentParser } = require('argparse');
-// var Toml = require('toml');
-
 const toml = require('@iarna/toml');
 const fs = require('fs');
 const path = require('path');
 const request = require('request-promise');
-const LinkHeader = require('http-link-header');
+const { LinkHeader } = require('http-link-header');
 const Ajv = require('ajv');
 const { parse } = require("args-any");
-// var toml = require('toml');
 
 
+
+
+// import { parse as TOML } from '@iarna/toml'
 // import fs = require('fs')
 // import path = require('path')
 
@@ -66,7 +66,6 @@ export class Zotero {
     'Zotero-API-Version': '3',
   }
 
-  //move it to cli 
   async run() {
     this.output = ''
     // global parameters for all commands
@@ -94,7 +93,6 @@ export class Zotero {
     this.args = this.parser.parseArgs()
 
     // pick up config
-
     const config: string = [this.args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`].find(cfg => fs.existsSync(cfg))
     this.config = config ? toml.parse(fs.readFileSync(config, 'utf-8')) : {}
 
@@ -192,8 +190,8 @@ export class Zotero {
     if (this.args.group_id) {
       this.args.group_id = this.extractGroup(this.args.group_id)
       if (!this.args.group_id) {
-	this.parser.error('Unable to extract group_id from the string provided via --group_id.')
-	return
+  this.parser.error('Unable to extract group_id from the string provided via --group_id.')
+  return
       }    
     }
     */
@@ -424,8 +422,8 @@ export class Zotero {
 
   async $collection(argparser = null) {
     /** 
-	Retrieve information about a specific collection --key KEY (API: /collections/KEY or /collections/KEY/tags). Use 'collection --help' for details.   
-	(Note: Retrieve items is a collection via 'items --collection KEY'.)
+  Retrieve information about a specific collection --key KEY (API: /collections/KEY or /collections/KEY/tags). Use 'collection --help' for details.   
+  (Note: Retrieve items is a collection via 'items --collection KEY'.)
      */
 
     if (argparser) {
@@ -492,9 +490,9 @@ export class Zotero {
 
   async $items(argparser = null) {
     /** 
-	Retrieve list of items from API. (API: /items, /items/top, /collections/COLLECTION/items/top). 
-	Use 'items --help' for details. 
-	By default, all items are retrieved. With --top or limit (via --filter) the default number of items are retrieved. 
+  Retrieve list of items from API. (API: /items, /items/top, /collections/COLLECTION/items/top). 
+  Use 'items --help' for details. 
+  By default, all items are retrieved. With --top or limit (via --filter) the default number of items are retrieved. 
     */
 
     let items
@@ -573,9 +571,9 @@ export class Zotero {
 
   async $item(argparser = null) {
     /** 
-	Retrieve an item (item --key KEY), save/add file attachments, retrieve children. Manage collections and tags. (API: /items/KEY/ or /items/KEY/children). 
-
-	Also see 'attachment', 'create' and 'update'.
+  Retrieve an item (item --key KEY), save/add file attachments, retrieve children. Manage collections and tags. (API: /items/KEY/ or /items/KEY/children). 
+ 
+  Also see 'attachment', 'create' and 'update'.
     */
 
     if (argparser) {
@@ -684,8 +682,8 @@ export class Zotero {
 
   async $attachment(argparser = null) {
     /** 
-	Retrieve/save file attachments for the item specified with --key KEY (API: /items/KEY/file). 
-	Also see 'item', which has options for adding/saving file attachments. 
+  Retrieve/save file attachments for the item specified with --key KEY (API: /items/KEY/file). 
+  Also see 'item', which has options for adding/saving file attachments. 
     */
 
     if (argparser) {
@@ -707,9 +705,9 @@ export class Zotero {
 
   async $create_item(argparser = null) {
     /** 
-	Create a new item or items. (API: /items/new) You can retrieve a template with the --template option.  
-
-	Use this option to create both top-level items, as well as child items (including notes and links).
+  Create a new item or items. (API: /items/new) You can retrieve a template with the --template option.  
+ 
+  Use this option to create both top-level items, as well as child items (including notes and links).
     */
 
     if (argparser) {
@@ -874,5 +872,8 @@ export class Zotero {
     } else {
       this.show(tags)
     }
+
+
   }
+
 }

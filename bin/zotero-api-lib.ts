@@ -4,8 +4,9 @@ require('dotenv').config();
 require('docstring');
 const os = require('os');
 
+
 // import { ArgumentParser } from 'argparse'
-const { ArgumentParser } = require('argparse');
+const { ArgumentParser, parser } = require('argparse');
 const toml = require('@iarna/toml');
 const fs = require('fs');
 const path = require('path');
@@ -13,6 +14,7 @@ const request = require('request-promise');
 const { LinkHeader } = require('http-link-header');
 const Ajv = require('ajv');
 const { parse } = require("args-any");
+// const { parArg, re } = require('./zotero-cli.ts')
 
 
 
@@ -33,26 +35,26 @@ function sleep(msecs) {
   return new Promise(resolve => setTimeout(resolve, msecs))
 }
 
-const arg = new class {
-  integer(v) {
-    if (isNaN(parseInt(v))) throw new Error(`${JSON.stringify(v)} is not an integer`)
-    return parseInt(v)
-  }
+// const arg = new class {
+//   integer(v) {
+//     if (isNaN(parseInt(v))) throw new Error(`${JSON.stringify(v)} is not an integer`)
+//     return parseInt(v)
+//   }
 
-  file(v) {
-    if (!fs.existsSync(v) || !fs.lstatSync(v).isFile()) throw new Error(`${JSON.stringify(v)} is not a file`)
-    return v
-  }
+//   file(v) {
+//     if (!fs.existsSync(v) || !fs.lstatSync(v).isFile()) throw new Error(`${JSON.stringify(v)} is not a file`)
+//     return v
+//   }
 
-  path(v) {
-    if (!fs.existsSync(v)) throw new Error(`${JSON.stringify(v)} does not exist`)
-    return v
-  }
+//   path(v) {
+//     if (!fs.existsSync(v)) throw new Error(`${JSON.stringify(v)} does not exist`)
+//     return v
+//   }
 
-  json(v) {
-    return JSON.parse(v)
-  }
-}
+//   json(v) {
+//     return JSON.parse(v)
+//   }
+// }
 
 export class Zotero {
   args: any
@@ -60,6 +62,7 @@ export class Zotero {
   parser: any
   config: any
   zotero: any
+  arg: any
   base = 'https://api.zotero.org'
   headers = {
     'User-Agent': 'Zotero-CLI',
@@ -69,28 +72,28 @@ export class Zotero {
   async run() {
     this.output = ''
     // global parameters for all commands
-    this.parser = new ArgumentParser
-    this.parser.addArgument('--api-key', { help: 'The API key to access the Zotero API.' })
-    this.parser.addArgument('--config', { type: arg.file, help: 'Configuration file (toml format). Note that ./zotero-cli.toml and ~/.config/zotero-cli/zotero-cli.toml is picked up automatically.' })
-    this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
-    this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
-    // See below. If changed, add: You can provide the group-id as zotero-select link (zotero://...). Only the group-id is used, the item/collection id is discarded.
-    this.parser.addArgument('--indent', { type: arg.integer, help: 'Identation for json output.' })
-    this.parser.addArgument('--out', { help: 'Output to file' })
-    this.parser.addArgument('--verbose', { action: 'storeTrue', help: 'Log requests.' })
+    // this.parser = new ArgumentParser
+    // this.parser.addArgument('--api-key', { help: 'The API key to access the Zotero API.' })
+    // this.parser.addArgument('--config', { type: arg.file, help: 'Configuration file (toml format). Note that ./zotero-cli.toml and ~/.config/zotero-cli/zotero-cli.toml is picked up automatically.' })
+    // this.parser.addArgument('--user-id', { type: arg.integer, help: 'The id of the user library.' })
+    // this.parser.addArgument('--group-id', { type: arg.integer, help: 'The id of the group library.' })
+    // // See below. If changed, add: You can provide the group-id as zotero-select link (zotero://...). Only the group-id is used, the item/collection id is discarded.
+    // this.parser.addArgument('--indent', { type: arg.integer, help: 'Identation for json output.' })
+    // this.parser.addArgument('--out', { help: 'Output to file' })
+    // this.parser.addArgument('--verbose', { action: 'storeTrue', help: 'Log requests.' })
 
-    const subparsers = this.parser.addSubparsers({ title: 'commands', dest: 'command', required: true })
-    // add all methods that do not start with _ as a command
-    for (const cmd of Object.getOwnPropertyNames(Object.getPrototypeOf(this)).sort()) {
-      if (typeof this[cmd] !== 'function' || cmd[0] !== '$') continue
+    // const subparsers = this.parser.addSubparsers({ title: 'commands', dest: 'command', required: true })
+    // // add all methods that do not start with _ as a command
+    // for (const cmd of Object.getOwnPropertyNames(Object.getPrototypeOf(this)).sort()) {
+    //   if (typeof this[cmd] !== 'function' || cmd[0] !== '$') continue
 
-      const sp = subparsers.addParser(cmd.slice(1).replace(/_/g, '-'), { description: this[cmd].__doc__, help: this[cmd].__doc__ })
-      // when called with an argparser, the command is expected to add relevant parameters and return
-      // the command must have a docstring
-      this[cmd](sp)
-    }
+    //   const sp = subparsers.addParser(cmd.slice(1).replace(/_/g, '-'), { description: this[cmd].__doc__, help: this[cmd].__doc__ })
+    //   // when called with an argparser, the command is expected to add relevant parameters and return
+    //   // the command must have a docstring
+    //   this[cmd](sp)
+    // }
 
-    this.args = this.parser.parseArgs()
+    // this.args = this.parser.parseArgs()
 
     // pick up config
     const config: string = [this.args.config, 'zotero-cli.toml', `${os.homedir()}/.config/zotero-cli/zotero-cli.toml`].find(cfg => fs.existsSync(cfg))
@@ -137,17 +140,17 @@ export class Zotero {
 
       if (typeof value === 'undefined') continue
 
-      if (option.type === arg.integer) {
+      if (option.type === this.arg.integer) {
         if (isNaN(parseInt(value))) this.parser.error(`${option.dest} must be numeric, not ${value}`)
         value = parseInt(value)
 
-      } else if (option.type === arg.path) {
+      } else if (option.type === this.arg.path) {
         if (!fs.existsSync(value)) this.parser.error(`${option.dest}: ${value} does not exist`)
 
-      } else if (option.type === arg.file) {
+      } else if (option.type === this.arg.file) {
         if (!fs.existsSync(value) || !fs.lstatSync(value).isFile()) this.parser.error(`${option.dest}: ${value} is not a file`)
 
-      } else if (option.type === arg.json && typeof value === 'string') {
+      } else if (option.type === this.arg.json && typeof value === 'string') {
         try {
           value = JSON.parse(value)
         } catch (err) {
@@ -379,12 +382,12 @@ export class Zotero {
   async $collections(argparser = null) {
     /** Retrieve a list of collections or create a collection. (API: /collections, /collections/top, /collections/<collectionKey>/collections). Use 'collections --help' for details. */
 
-    if (argparser) {
-      argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
-      argparser.addArgument('--key', { help: 'Show all the child collections of collection with key. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
-      argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--top', { action: 'storeTrue', help: 'Show only collection at top level.' })
+    //   argparser.addArgument('--key', { help: 'Show all the child collections of collection with key. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
+    //   argparser.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
+    //   return
+    // }
 
     if (this.args.key) {
       this.args.key = this.extractKeyAndSetGroup(this.args.key)
@@ -426,14 +429,14 @@ export class Zotero {
   (Note: Retrieve items is a collection via 'items --collection KEY'.)
      */
 
-    if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the collection (required). You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
-      argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
-      // argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
-      argparser.addArgument('--add', { nargs: '*', help: 'Add items to this collection. Note that adding items to collections with \'item --addtocollection\' may require fewer API queries. (Convenience method: patch item->data->collections.)' })
-      argparser.addArgument('--remove', { nargs: '*', help: 'Convenience method: Remove items from this collection. Note that removing items from collections with \'item --removefromcollection\' may require fewer API queries. (Convenience method: patch item->data->collections.)' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--key', { required: true, help: 'The key of the collection (required). You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
+    //   argparser.addArgument('--tags', { action: 'storeTrue', help: 'Display tags present in the collection.' })
+    //   // argparser.addArgument('itemkeys', { nargs: '*' , help: 'Item keys for items to be added or removed from this collection.'})
+    //   argparser.addArgument('--add', { nargs: '*', help: 'Add items to this collection. Note that adding items to collections with \'item --addtocollection\' may require fewer API queries. (Convenience method: patch item->data->collections.)' })
+    //   argparser.addArgument('--remove', { nargs: '*', help: 'Convenience method: Remove items from this collection. Note that removing items from collections with \'item --removefromcollection\' may require fewer API queries. (Convenience method: patch item->data->collections.)' })
+    //   return
+    // }
 
     if (this.args.key) {
       this.args.key = this.extractKeyAndSetGroup(this.args.key)
@@ -500,10 +503,10 @@ export class Zotero {
     if (argparser) {
       argparser.addArgument('--count', { action: 'storeTrue', help: 'Return the number of items.' })
       // argparser.addArgument('--all', { action: 'storeTrue', help: 'obsolete' })
-      argparser.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
+      argparser.addArgument('--filter', { type: this.arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
       argparser.addArgument('--collection', { help: 'Retrive list of items for collection. You can provide the collection key as a zotero-select link (zotero://...) to also set the group-id.' })
       argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection (excluding child items / attachments, excluding trashed items).' })
-      argparser.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype.' })
+      argparser.addArgument('--validate', { type: this.arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype.' })
       return
     }
 
@@ -579,7 +582,7 @@ export class Zotero {
     if (argparser) {
       argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
       argparser.addArgument('--children', { action: 'storeTrue', help: 'Retrieve list of children for the item.' })
-      argparser.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. To retrieve multiple items you have use "itemkey"; for example: \'{"format": "json,bib", "itemkey": "A,B,C"}\'. See https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.' })
+      argparser.addArgument('--filter', { type: this.arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. To retrieve multiple items you have use "itemkey"; for example: \'{"format": "json,bib", "itemkey": "A,B,C"}\'. See https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.' })
       argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item. (/items/new)' })
       argparser.addArgument('--savefiles', { nargs: '*', help: 'Download all attachments from the item (/items/KEY/file).' })
       argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections. (Convenience method: patch item->data->collections.)' })

@@ -39,6 +39,7 @@
   "dependencies": {
     "@iarna/toml": "^2.2.3",
     "ajv": "^6.12.0",
+    "arg": "^5.0.0",
     "argparse": "^1.0.10",
     "args-any": "^1.2.1",
     "async": "^3.2.0",
@@ -47,6 +48,7 @@
     "http-link-header": "^1.0.2",
     "md5": "^2.3.0",
     "md5-file": "^5.0.0",
+    "parseArgs": "0.0.2",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
     "toml": "^3.0.0"

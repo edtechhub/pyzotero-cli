@@ -500,15 +500,15 @@ export class Zotero {
 
     let items
 
-    if (argparser) {
-      argparser.addArgument('--count', { action: 'storeTrue', help: 'Return the number of items.' })
-      // argparser.addArgument('--all', { action: 'storeTrue', help: 'obsolete' })
-      argparser.addArgument('--filter', { type: this.arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
-      argparser.addArgument('--collection', { help: 'Retrive list of items for collection. You can provide the collection key as a zotero-select link (zotero://...) to also set the group-id.' })
-      argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection (excluding child items / attachments, excluding trashed items).' })
-      argparser.addArgument('--validate', { type: this.arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype.' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--count', { action: 'storeTrue', help: 'Return the number of items.' })
+    //   // argparser.addArgument('--all', { action: 'storeTrue', help: 'obsolete' })
+    //   argparser.addArgument('--filter', { type: this.arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
+    //   argparser.addArgument('--collection', { help: 'Retrive list of items for collection. You can provide the collection key as a zotero-select link (zotero://...) to also set the group-id.' })
+    //   argparser.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection (excluding child items / attachments, excluding trashed items).' })
+    //   argparser.addArgument('--validate', { type: this.arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype.' })
+    //   return
+    // }
 
     if (this.args.count && this.args.validate) {
       this.parser.error('--count cannot be combined with --validate')
@@ -578,19 +578,6 @@ export class Zotero {
  
   Also see 'attachment', 'create' and 'update'.
     */
-
-    if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
-      argparser.addArgument('--children', { action: 'storeTrue', help: 'Retrieve list of children for the item.' })
-      argparser.addArgument('--filter', { type: this.arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. To retrieve multiple items you have use "itemkey"; for example: \'{"format": "json,bib", "itemkey": "A,B,C"}\'. See https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.' })
-      argparser.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item. (/items/new)' })
-      argparser.addArgument('--savefiles', { nargs: '*', help: 'Download all attachments from the item (/items/KEY/file).' })
-      argparser.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections. (Convenience method: patch item->data->collections.)' })
-      argparser.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections. (Convenience method: patch item->data->collections.)' })
-      argparser.addArgument('--addtags', { nargs: '*', help: 'Add tags to item. (Convenience method: patch item->data->tags.)' })
-      argparser.addArgument('--removetags', { nargs: '*', help: 'Remove tags from item. (Convenience method: patch item->data->tags.)' })
-      return
-    }
 
 
     if (this.args.key) {
@@ -689,11 +676,11 @@ export class Zotero {
   Also see 'item', which has options for adding/saving file attachments. 
     */
 
-    if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
-      argparser.addArgument('--save', { required: true, help: 'Filename to save attachment to.' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
+    //   argparser.addArgument('--save', { required: true, help: 'Filename to save attachment to.' })
+    //   return
+    // }
 
     if (this.args.key) {
       this.args.key = this.extractKeyAndSetGroup(this.args.key)

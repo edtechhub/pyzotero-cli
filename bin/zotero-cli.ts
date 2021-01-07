@@ -10,7 +10,7 @@ const os = require('os');
 
 const { Zotero } = require('./zotero-api-lib.ts');
 
-import { ArgumentParser } from 'argparse'
+// import { ArgumentParser } from 'argparse'
 const TOML = require('@iarna/toml');
 const fs = require('fs');
 const path = require('path');
@@ -77,7 +77,30 @@ function parArg(api) {
         sp.addArgument('--key', { help: 'Show all the child collections of collection with key. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
         sp.addArgument('--create-child', { nargs: '*', help: 'Create child collections of key (or at the top level if no key is specified) with the names specified.' })
       }
-      
+      if (cmd === "$items") {
+        sp.addArgument('--count', { action: 'storeTrue', help: 'Return the number of items.' })
+        // argparser.addArgument('--all', { action: 'storeTrue', help: 'obsolete' })
+        sp.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. For example: \'{"format": "json,bib", "limit": 100, "start": 100}\'.' })
+        sp.addArgument('--collection', { help: 'Retrive list of items for collection. You can provide the collection key as a zotero-select link (zotero://...) to also set the group-id.' })
+        sp.addArgument('--top', { action: 'storeTrue', help: 'Retrieve top-level items in the library/collection (excluding child items / attachments, excluding trashed items).' })
+        sp.addArgument('--validate', { type: arg.path, help: 'json-schema file for all itemtypes, or directory with schema files, one per itemtype.' })
+      }
+      if (cmd === "$item") {
+        sp.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
+        sp.addArgument('--children', { action: 'storeTrue', help: 'Retrieve list of children for the item.' })
+        sp.addArgument('--filter', { type: arg.json, help: 'Provide a filter as described in the Zotero API documentation under read requests / parameters. To retrieve multiple items you have use "itemkey"; for example: \'{"format": "json,bib", "itemkey": "A,B,C"}\'. See https://www.zotero.org/support/dev/web_api/v3/basics#search_syntax.' })
+        sp.addArgument('--addfile', { nargs: '*', help: 'Upload attachments to the item. (/items/new)' })
+        sp.addArgument('--savefiles', { nargs: '*', help: 'Download all attachments from the item (/items/KEY/file).' })
+        sp.addArgument('--addtocollection', { nargs: '*', help: 'Add item to collections. (Convenience method: patch item->data->collections.)' })
+        sp.addArgument('--removefromcollection', { nargs: '*', help: 'Remove item from collections. (Convenience method: patch item->data->collections.)' })
+        sp.addArgument('--addtags', { nargs: '*', help: 'Add tags to item. (Convenience method: patch item->data->tags.)' })
+        sp.addArgument('--removetags', { nargs: '*', help: 'Remove tags from item. (Convenience method: patch item->data->tags.)' })
+      }
+      if (cmd === "$attachment") {
+        sp.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
+        sp.addArgument('--save', { required: true, help: 'Filename to save attachment to.' })
+      }
+
     }
     else {
       api[cmd](sp)
@@ -104,11 +127,17 @@ async function $get(argparser = null) {
   /** Make a direct query to the API using 'GET uri'. */
 console.log("rrrrrrr")
 
- if (argparser) {                                                                                                                            
+ if (argparser) {                                                                                                                                        
     argparser.addArgument('--root', { action: 'storeTrue', help: 'TODO: document' })
 argparser.addArgument('uri', { nargs: '+', help: 'TODO: document' })
     return
 }
+
+
+
+
+
+
 
 
 

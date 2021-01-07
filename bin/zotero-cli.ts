@@ -100,6 +100,15 @@ function parArg(api) {
         sp.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
         sp.addArgument('--save', { required: true, help: 'Filename to save attachment to.' })
       }
+      if (cmd === "$create_item") {
+        sp.addArgument('--template', { help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'." })
+        sp.addArgument('items', { nargs: '*', help: 'Json files for the items to be created.' })
+      }
+      if (cmd === "$update_item") {
+        sp.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
+        sp.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item by sumbitting the complete json.' })
+        sp.addArgument('items', { nargs: 1, help: 'Path of item files in json format.' })
+      }
 
     }
     else {
@@ -127,11 +136,13 @@ async function $get(argparser = null) {
   /** Make a direct query to the API using 'GET uri'. */
 console.log("rrrrrrr")
 
- if (argparser) {                                                                                                                                        
+ if (argparser) {                                                                                                                                            
     argparser.addArgument('--root', { action: 'storeTrue', help: 'TODO: document' })
 argparser.addArgument('uri', { nargs: '+', help: 'TODO: document' })
     return
 }
+
+
 
 
 

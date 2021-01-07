@@ -700,11 +700,11 @@ export class Zotero {
   Use this option to create both top-level items, as well as child items (including notes and links).
     */
 
-    if (argparser) {
-      argparser.addArgument('--template', { help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'." })
-      argparser.addArgument('items', { nargs: '*', help: 'Json files for the items to be created.' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--template', { help: "Retrieve a template for the item you wish to create. You can retrieve the template types using the main argument 'types'." })
+    //   argparser.addArgument('items', { nargs: '*', help: 'Json files for the items to be created.' })
+    //   return
+    // }
 
     if (this.args.template) {
       this.show(await this.get('/items/new', { userOrGroupPrefix: false, params: { itemType: this.args.template } }))
@@ -720,12 +720,12 @@ export class Zotero {
   async $update_item(argparser = null) {
     /** Update/replace an item (--key KEY), either update (API: patch /items/KEY) or replacing (using --replace, API: put /items/KEY). */
 
-    if (argparser) {
-      argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
-      argparser.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item by sumbitting the complete json.' })
-      argparser.addArgument('items', { nargs: 1, help: 'Path of item files in json format.' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--key', { required: true, help: 'The key of the item. You can provide the key as zotero-select link (zotero://...) to also set the group-id.' })
+    //   argparser.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item by sumbitting the complete json.' })
+    //   argparser.addArgument('items', { nargs: 1, help: 'Path of item files in json format.' })
+    //   return
+    // }
 
     if (this.args.key) {
       this.args.key = this.extractKeyAndSetGroup(this.args.key)

@@ -1,0 +1,60 @@
+{
+  "name": "zotero-cli",
+  "version": "1.0.6",
+  "description": "Command line for interacting with Zotero libraries",
+  "main": "bin/zotero-cli.js",
+  "preferGlobal": true,
+  "bin": {
+    "zotero-cli": "./bin/zotero-cli.js"
+  },
+  "scripts": {
+    "start": "ts-node bin/zotero-cli.ts",
+    "preversion": "npm test",
+    "postversion": "git push --follow-tags",
+    "test": "tslint -t stylish --project .",
+    "build": "tsc && chmod +x bin/*.js",
+    "prepublishOnly": "npm run build",
+    "go": "npm run build && npm version patch && npm publish",
+    "publish:patch": "npm run build; npm version patch; npm publish; git push --tags",
+    "publish:minor": "npm run build; npm version minor; npm publish; git push --tags",
+    "publish:major": "npm run build; npm version major; npm publish; git push --tags"
+    "fixed": "npm test && npm run build && git add bin && git commit -m \"fixes #$FIXED\" && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opendeved/zotero-cli.git"
+  },
+  "keywords": [
+    "zotero"
+  ],
+  "author": "opendeved",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/opendeved/zotero-cli/issues"
+  },
+  "homepage": "https://github.com/opendeved/zotero-cli#readme",
+  "devDependencies": {
+    "@types/node": "^13.11.1",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.3",
+    "ajv": "^6.12.0",
+    "argparse": "^1.0.10",
+    "docstring": "^1.1.0",
+    "dotenv": "^8.2.0",
+    "http-link-header": "^1.0.2",
+    "md5-file": "^5.0.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5"
+  },
+  "files": [
+    "package.json",
+    "bin/zotero-cli.d.ts",
+    "bin/zotero-cli.js",
+    "docs/COMMANDS.md",
+    "README.md"
+  ]
+}

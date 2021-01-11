@@ -788,10 +788,10 @@ export class Zotero {
      * Note that to retrieve a template, use 'create-item --template TYPE' rather than this command.
      */
 
-    if (argparser) {
-      argparser.addArgument('--type', { help: 'Display fields types for TYPE.' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--type', { help: 'Display fields types for TYPE.' })
+    //   return
+    // }
 
     if (this.args.type) {
       this.show(await this.get('/itemTypeFields', { params: { itemType: this.args.type }, userOrGroupPrefix: false }))
@@ -807,10 +807,10 @@ export class Zotero {
   async $searches(argparser = null) {
     /** Return a list of the saved searches of the library. Create new saved searches. (API: /searches) */
 
-    if (argparser) {
-      argparser.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
+    //   return
+    // }
 
     if (this.args.create) {
       let searchDef = [];
@@ -838,11 +838,11 @@ export class Zotero {
   async $tags(argparser = null) {
     /** Return a list of tags in the library. Options to filter and count tags. (API: /tags) */
 
-    if (argparser) {
-      argparser.addArgument('--filter', { help: 'Tags of all types matching a specific name.' })
-      argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
-      return
-    }
+    // if (argparser) {
+    //   argparser.addArgument('--filter', { help: 'Tags of all types matching a specific name.' })
+    //   argparser.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
+    //   return
+    // }
 
     let rawTags = null;
     if (this.args.filter) {

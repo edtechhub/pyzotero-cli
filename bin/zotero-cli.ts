@@ -109,6 +109,17 @@ function parArg(api) {
         sp.addArgument('--replace', { action: 'storeTrue', help: 'Replace the item by sumbitting the complete json.' })
         sp.addArgument('items', { nargs: 1, help: 'Path of item files in json format.' })
       }
+      if (cmd === "$tags") {
+        sp.addArgument('--filter', { help: 'Tags of all types matching a specific name.' })
+        sp.addArgument('--count', { action: 'storeTrue', help: 'TODO: document' })
+      }
+      if (cmd === "$searches") {
+        sp.addArgument('--create', { nargs: 1, help: 'Path of JSON file containing the definitions of saved searches.' })
+      }
+
+      if (cmd === "$fields") {
+        sp.addArgument('--type', { help: 'Display fields types for TYPE.' })
+      }
 
     }
     else {
@@ -123,7 +134,7 @@ function parArg(api) {
 
 
 async function $key(argparser = null) {
-/** Show details about this API key. (API: /keys ) */
+  /** Show details about this API key. (API: /keys ) */
 
   if (argparser) return
 
@@ -134,13 +145,13 @@ async function $key(argparser = null) {
 
 async function $get(argparser = null) {
   /** Make a direct query to the API using 'GET uri'. */
-console.log("rrrrrrr")
+  console.log("rrrrrrr")
 
- if (argparser) {                                                                                                                                            
+  if (argparser) {
     argparser.addArgument('--root', { action: 'storeTrue', help: 'TODO: document' })
-argparser.addArgument('uri', { nargs: '+', help: 'TODO: document' })
+    argparser.addArgument('uri', { nargs: '+', help: 'TODO: document' })
     return
-}
+  }
 
 
 
@@ -163,8 +174,8 @@ argparser.addArgument('uri', { nargs: '+', help: 'TODO: document' })
 
 
 
-  
-    
+
+
   for (const uri of this.args.uri) {
     this.show(await this.get(uri, { userOrGroupPrefix: !this.args.root }))
   }
@@ -213,7 +224,7 @@ ee.parser = parArg(ee)
 ee.args = parArg(ee).parseArgs()
 ee.run(
 
-    ).catch(err  => {
+).catch(err => {
   console.error('error:', err)
   process.exit(1)
 })

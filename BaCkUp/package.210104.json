@@ -19,19 +19,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/edtechhub/zotero-cli.git"
+    "url": "git+https://github.com/opendeved/zotero-cli.git"
   },
   "keywords": [
     "zotero"
   ],
-  "author": "Emiliano Heyns",
+  "author": "opendeved",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/edtechhub/zotero-cli/issues"
+    "url": "https://github.com/opendeved/zotero-cli/issues"
   },
-  "homepage": "https://github.com/edtechhub/zotero-cli#readme",
+  "homepage": "https://github.com/opendeved/zotero-cli#readme",
   "devDependencies": {
-    "@types/node": "^13.13.38",
+    "@types/node": "^13.11.1",
     "ts-node": "^8.8.2",
     "tslint": "^6.1.1",
     "typescript": "^3.8.3"
@@ -39,19 +39,13 @@
   "dependencies": {
     "@iarna/toml": "^2.2.3",
     "ajv": "^6.12.0",
-    "arg": "^5.0.0",
     "argparse": "^1.0.10",
-    "args-any": "^1.2.1",
-    "async": "^3.2.0",
     "docstring": "^1.1.0",
     "dotenv": "^8.2.0",
     "http-link-header": "^1.0.2",
-    "md5": "^2.3.0",
     "md5-file": "^5.0.0",
-    "parseArgs": "0.0.2",
     "request": "^2.88.2",
-    "request-promise": "^4.2.5",
-    "toml": "^3.0.0"
+    "request-promise": "^4.2.5"
   },
   "files": [
     "package.json",

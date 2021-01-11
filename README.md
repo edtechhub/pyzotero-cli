@@ -2,7 +2,14 @@
 
 A commandline tool to interact with the Zotero API. Developed by [@bjohas](https://github.com/bjohas), [@retorquere](https://github.com/retorquere) and [@a1diablo](https://github.com/a1diablo).
 
-## Installation
+Install this tool via
+```
+npm install -g zotero-cli
+```
+
+This tool primarily parses the commandline option, while the API calls are made with https://github.com/OpenDevEd/zotero-api-lib-ts.
+
+## Installation from source
 ### node
 
 Run the following command to install dependencies

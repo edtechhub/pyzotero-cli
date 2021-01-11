@@ -11,14 +11,17 @@
     "preserveConstEnums": false,
     "sourceMap": false,
     "downlevelIteration": true,
-    "lib": [ "es2017", "dom" ],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
     "typeRoots": [
       "./typings",
       "./node_modules/@types"
     ]
   },
-  "include": [
-    "bin"
+  "files": [
+    "bin/zotero-cli.ts"
   ],
   "exclude": [
     "node_modules",

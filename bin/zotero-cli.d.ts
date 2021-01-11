@@ -1,2 +1,25 @@
-#!/usr/bin/env node
-export {};
+declare const os: any;
+declare const Zotero: any;
+declare const TOML: any;
+declare const fs: any;
+declare const path: any;
+declare const request: any;
+declare const LinkHeader: any;
+declare const ajv: any;
+declare const parse: any;
+declare var async: any;
+declare const ArgumentParser: any, argparser: any;
+declare const md5: any;
+declare const arg: {
+    integer(v: any): number;
+    file(v: any): any;
+    path(v: any): any;
+    json(v: any): any;
+};
+declare function parArg(api: any): any;
+declare function $key(argparser?: any): Promise<void>;
+declare function $get(argparser?: any): Promise<void>;
+declare function $post(argparser?: any): Promise<void>;
+declare function $put(argparser?: any): Promise<void>;
+declare function $delete(argparser?: any): Promise<void>;
+declare const ee: any;
